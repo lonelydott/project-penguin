@@ -3,9 +3,9 @@ import java.util.Scanner;
 import java.util.Arrays;
 public class Game {
   private static int[][] playerOneBoard;
-  private static int[][] playerOneShips;
+  private static ArrayList<Battleship> playerOneShips;
   private static int[][] playerTwoBoard;
-  private static int[][] playerTwoShips;
+  private static ArrayList<Battleship> playerTwoShips;
 //BOARDS: -1 = battleship, 0 = empty, 1 = cleared
 
 
@@ -34,22 +34,49 @@ public class Game {
     playerTwoBoard = createBoard(rows, columns);
 
     while(!(input.equals("stop"))){
+      clearTerminal();
+      gotoTop();
       turn ++; // odd turns = player 1, even turns = player 2
-      if (turn % 2 == 0) {//player2
-        printBoard(playerTwoBoard);
-        System.out.println("<PLAYER TWO BOARD>");
-        System.out.println("PLEASE CHOOSE COORDINATES");
-      }
-      else {//player1
+      if (turn % 2 == 0) {//player 2's turn
         printBoard(playerOneBoard);
-        System.out.println("<PLAYER ONE BOARD>");
-        System.out.println("PLEASE CHOOSE COORDINATES");
-      }
+        System.out.println("<PLAYER ONE'S BOARD>");
+        System.out.println("PLEASE CHOOSE COORDINATES (EX: A1)");
 
+        input = in.nextLine();
+
+        if (attack(input, playerOneBoard)) {//RETURN HIT MESSAGHE
+          //
+        }
+        else { //RETURN MISS MESSAGE
+          clearTerminal();
+          gotoTop();
+          System.out.println("You missed!");
+          printBoard(playerOneBoard);
+        }
+      }
+      else {//player 1's turn
+        printBoard(playerTwoBoard);
+        System.out.println("<PLAYER TWO'S BOARD>");
+        System.out.println("PLEASE CHOOSE COORDINATES (EX: A1)");
+        input = in.nextLine();
+
+        if (attack(input, playerTwoBoard)) {//RETURN HIT MESSAGHE
+          //
+        }
+        else { //RETURN MISS MESSAGE
+          clearTerminal();
+          gotoTop();
+          System.out.println("You missed!");
+          printBoard(playerTwoBoard);
+        }
+      }
+      System.out.println("Press Enter for Next Turn");
       input = in.nextLine();
+
     }
   }
 
+  //BOARD METHODS
   public static int[][] createBoard(int row, int col) {
     int[][] board = new int[row + 1][col + 1];
     for (int i = 1; i <= row; i ++) {
@@ -68,11 +95,24 @@ public class Game {
   public static void printBoard(int[][] board) {
     for (int i = 0; i < board.length; i ++) {
       for (int j = 0; j < board[i].length; j ++) {
-        if (board[i][j] < 65) {
-          System.out.print(board[i][j]);
+        if (board[i][j] >= 'A' && board[i][j] <= 'Z') {
+          System.out.print((char)(board[i][j]));
         }
         else {
-          System.out.print((char)(board[i][j]));
+          if (board[i][j] == 1 && j > 0) { //HIT
+            System.out.print("X");
+          }
+          else if (board[i][j] == -1) { //MISS
+            System.out.print("O");
+          }
+          else {
+            if (j == 0) {
+              System.out.print(board[i][j]);
+            }
+            else {
+              System.out.print(" ");
+            }
+          }
         }
         if (j < board[i].length - 1) {
           System.out.print(", ");
@@ -82,8 +122,35 @@ public class Game {
     }
   }
 
+  //GAME METHODS
+  public static boolean attack(String input, int[][] beingAttacked) { //ASSUME IT IS IN A1 FORMAT
+    int row = Integer.parseInt(input.substring(1, 2));
+    int col = input.charAt(0) - 64;
+
+    if (beingAttacked[row][col] == 0) {
+      beingAttacked[row][col] = -1;
+      return false;
+    }
+    //CHECK IF COORDINATE IS BATTLESHIP COORDINATE
+    return true;
+  }
 
 
 
-
+  //THANK YOU MR. K
+  public static void wait(int millis){
+    try {
+      Thread.sleep(millis);
+    }
+    catch (InterruptedException e) {
+    }
+  }
+  public static void gotoTop(){
+    //go to top left of screen
+    System.out.println("\033[1;1H");
+  }
+  public static void clearTerminal(){
+    //erase terminal
+    System.out.println("\033[2J");
+  }
 }
