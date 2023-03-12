@@ -56,10 +56,14 @@ public class Game {
       Battleship ship = new Battleship(front, back);
       playerOneShips.add(ship);
       ship.place(playerOneBoard, (i + 1) * -1);
+      clearTerminal();
+      gotoTop();
       printBoard(playerOneBoard, false);
     }
-    //NOTE: NO DELAY FOR LAST SHIP
-    
+    System.out.println("YOUR FINAL BOARD");
+    in.nextLine();
+    in.nextLine();
+
     clearTerminal();
     gotoTop();
 
@@ -76,9 +80,13 @@ public class Game {
       Battleship ship = new Battleship(front, back);
       playerTwoShips.add(ship);
       ship.place(playerTwoBoard, (i + 1) * -1);
+      clearTerminal();
+      gotoTop();
       printBoard(playerTwoBoard, false);
     }
-    //NOTE: NO DELAY FOR LAST SHIP
+    System.out.println("YOUR FINAL BOARD");
+    in.nextLine();
+    in.nextLine();
 
     //BOMBING PHASE (AFTER PLACING SHIPS)
     while(!(input.equals("stop"))){
@@ -93,13 +101,19 @@ public class Game {
         input = in.next();
 
         if (attack(input, playerOneBoard)) {//RETURN HIT MESSAGHE
-          //
+          clearTerminal();
+          gotoTop();
+          System.out.println("You hit a ship!");
+          printBoard(playerOneBoard, true);
+          in.nextLine();
+          in.nextLine();
         }
         else { //RETURN MISS MESSAGE
           clearTerminal();
           gotoTop();
           System.out.println("You missed!");
           printBoard(playerOneBoard, true);
+          in.nextLine();
           in.nextLine();
         }
       }
@@ -111,7 +125,12 @@ public class Game {
         input = in.next();
 
         if (attack(input, playerTwoBoard)) {//RETURN HIT MESSAGHE
-          //
+          clearTerminal();
+          gotoTop();
+          System.out.println("You hit a ship!");
+          printBoard(playerTwoBoard, true);
+          in.nextLine();
+          in.nextLine();
         }
         else { //RETURN MISS MESSAGE
           clearTerminal();
@@ -119,11 +138,9 @@ public class Game {
           System.out.println("You missed!");
           printBoard(playerTwoBoard, true);
           in.nextLine();
+          in.nextLine();
         }
       }
-      System.out.println("Press Enter for Next Turn");
-      in.nextLine();
-
     }
   }
 
@@ -183,12 +200,16 @@ public class Game {
     int row = Integer.parseInt(input.substring(1, input.length()));
     int col = input.charAt(0) - 64;
 
-    if (beingAttacked[row][col] == 0) {
-      beingAttacked[row][col] = 2;
+    if (beingAttacked[row][col] >= 0) { // MISS
+      if (beingAttacked[row][col] == 0) {
+        beingAttacked[row][col] = 2;
+      }
       return false;
     }
-    //CHECK IF COORDINATE IS BATTLESHIP COORDINATE
-    return true;
+    else { // HIT!!!!!
+      beingAttacked[row][col] = 1;
+      return true;
+    }
   }
 
 
