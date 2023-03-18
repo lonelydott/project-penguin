@@ -38,4 +38,20 @@ public class Weapons{
       throw ArrayIndexOutOfBoundsException();
     }
   }
+  public static Battleship landmine(String coord){ //creates a 1x1 ship as bait to throwoff the enemy player
+    Battleship bait = new Battleship(coord, coord);
+  }
+  public static void sonar(int[][] board, String coord){ //creates a 1x1 ship as bait to throwoff the enemy player
+    row = Integer.parseInt(coord.substring(1, coord.length()));
+    col = coord.charAt(0) - 64;
+    if (row > 0 && row < board.length-1 && col > 0 && col < board[0].length){
+      for (int i = row - 1; i < row + 2; i ++){
+        for (int j = col - 1; j < col + 2; j++){
+          if (data[row][col] > 0){
+            // HOW DO I ACCESS THE CURRENT PLAYER'S VIEW OF THE OTHER PLAYER'S BOARD?
+          }
+        }
+      }
+    }
+  }
 }
