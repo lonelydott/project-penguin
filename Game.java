@@ -4,8 +4,10 @@ import java.util.Arrays;
 public class Game {
   private static int[][] playerOneBoard;
   private static ArrayList<Battleship> playerOneShips;
+  private static int playerOneShipsLeft;
   private static int[][] playerTwoBoard;
   private static ArrayList<Battleship> playerTwoShips;
+  private static int playerTwoShipsLeft;
 //BOARDS: 2 = miss, 0 = empty, 1 = hit
 
 
@@ -29,6 +31,8 @@ public class Game {
     while(numberShips <= 0){
       numberShips = in.nextInt();;
     }
+    playerOneShipsLeft = numberShips;
+    playerTwoShipsLeft = numberShips;
 
     System.out.println("Rows: " + rows);
     System.out.println("Columns (at most 26): " + columns);
@@ -53,14 +57,20 @@ public class Game {
 
       System.out.println("Back of Ship " + (i + 1) + " (A1 format): ");
       back = in.next();
-      Battleship ship = new Battleship(front, back);
-      playerOneShips.add(ship);
-      ship.place(playerOneBoard, (i + 1) * -1);
+      playerOneShips.add(new Battleship(front, back));
+      playerOneShips.get(i).place(playerOneBoard, (i + 1) * -1);
       clearTerminal();
       gotoTop();
       printBoard(playerOneBoard, false);
     }
+
     System.out.println("YOUR FINAL BOARD");
+    for (int i = 0; i < playerOneShips.size(); i ++) {
+      System.out.println("(Battleship " + (i + 1) + ") " + playerOneShips.get(i));
+    }
+    System.out.println("PRESS ENTER TO CONTINUE");
+
+
     in.nextLine();
     in.nextLine();
 
@@ -77,19 +87,25 @@ public class Game {
 
       System.out.println("Back of Ship " + (i + 1) + " (A1 format): ");
       back = in.next();
-      Battleship ship = new Battleship(front, back);
-      playerTwoShips.add(ship);
-      ship.place(playerTwoBoard, (i + 1) * -1);
+      playerTwoShips.add(new Battleship(front, back));
+      playerTwoShips.get(i).place(playerTwoBoard, (i + 1) * -1);
+
       clearTerminal();
       gotoTop();
       printBoard(playerTwoBoard, false);
     }
+
     System.out.println("YOUR FINAL BOARD");
+    for (int i = 0; i < playerTwoShips.size(); i ++) {
+      System.out.println("(Battleship " + (i + 1) + ") " + playerTwoShips.get(i));
+    }
+    System.out.println("PRESS ENTER TO CONTINUE");
+
     in.nextLine();
     in.nextLine();
 
     //BOMBING PHASE (AFTER PLACING SHIPS)
-    while(!(input.equals("stop"))){
+    while(playerOneShipsLeft > 0 && playerTwoShipsLeft > 0){
       clearTerminal();
       gotoTop();
       turn ++; // odd turns = player 1, even turns = player 2
@@ -100,11 +116,17 @@ public class Game {
         System.out.println("PLEASE CHOOSE COORDINATES (EX: A1)");
         input = in.next();
 
-        if (attack(input, playerOneBoard)) {//RETURN HIT MESSAGHE
+        int battleshipHit = playerOneBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
+        if (attack(input, playerOneBoard, playerOneShips)) {//RETURN HIT MESSAGHE
           clearTerminal();
           gotoTop();
           System.out.println("You hit a ship!");
           printBoard(playerOneBoard, true);
+
+          if (playerOneShips.get(battleshipHit).getLength() == 0) {
+            playerOneShipsLeft --;
+          }
+
           in.nextLine();
           in.nextLine();
         }
@@ -124,11 +146,17 @@ public class Game {
         System.out.println("PLEASE CHOOSE COORDINATES (EX: A1)");
         input = in.next();
 
-        if (attack(input, playerTwoBoard)) {//RETURN HIT MESSAGHE
+        int battleshipHit = playerTwoBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
+        if (attack(input, playerTwoBoard, playerTwoShips)) {//RETURN HIT MESSAGHE
           clearTerminal();
           gotoTop();
           System.out.println("You hit a ship!");
           printBoard(playerTwoBoard, true);
+
+          if (playerTwoShips.get(battleshipHit).getLength() == 0) {
+            playerTwoShipsLeft --;
+          }
+
           in.nextLine();
           in.nextLine();
         }
@@ -142,6 +170,15 @@ public class Game {
         }
       }
     }
+
+    if (playerOneShipsLeft == 0) {
+      System.out.println("PLAYER TWO WINS!");
+    }
+    else if (playerTwoShipsLeft == 0) {
+      System.out.println("PLAYER ONE WINS!");
+    }
+
+
   }
 
   //BOARD METHODS
@@ -196,18 +233,20 @@ public class Game {
   }
 
   //GAME METHODS
-  public static boolean attack(String input, int[][] beingAttacked) { //ASSUME IT IS IN A1 FORMAT
+  public static boolean attack(String input, int[][] board, ArrayList<Battleship> beingAttacked) { //ASSUME IT IS IN A1 FORMAT
     int row = Integer.parseInt(input.substring(1, input.length()));
     int col = input.charAt(0) - 64;
 
-    if (beingAttacked[row][col] >= 0) { // MISS
-      if (beingAttacked[row][col] == 0) {
-        beingAttacked[row][col] = 2;
+    if (board[row][col] >= 0) { // MISS
+      if (board[row][col] == 0) {
+        board[row][col] = 2;
       }
       return false;
     }
     else { // HIT!!!!!
-      beingAttacked[row][col] = 1;
+      int battleshipHit = (board[row][col] * -1) - 1;
+      beingAttacked.get(battleshipHit).minusOne();
+      board[row][col] = 1;
       return true;
     }
   }
