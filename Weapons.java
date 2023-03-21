@@ -58,7 +58,7 @@ public class Weapons{
   public static void sonar(int[][] board, String coord){ //creates a 1x1 ship as bait to throwoff the enemy player
     int row = Integer.parseInt(coord.substring(1, coord.length()));
     int col = coord.charAt(0) - 64;
-    if (row > 0 && row < board.length-1 && col > 0 && col < board[0].length){ //No idea what this loop does
+    if (row > 0 && row < board.length-1 && col > 0 && col < board[0].length){ //No idea what this loop does - Tim
       for (int i = row - 1; i < row + 2; i ++){
         for (int j = col - 1; j < col + 2; j++){
           if (board[row][col] > 0){
