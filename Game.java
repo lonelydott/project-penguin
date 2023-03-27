@@ -61,6 +61,8 @@ public class Game {
     clearTerminal();
     gotoTop();
 
+
+
     System.out.println("PLAYER ONE: CREATE YOUR SHIPS"); //PLAYER ONE
     printBoard(playerOneBoard, false);
     for (int i = 0; i < numberShips; i ++) {
@@ -74,6 +76,7 @@ public class Game {
         System.out.println("Please enter in valid A1 format");
         front = in.next();
       }
+
 
       System.out.println("Back of Ship " + (i + 1) + " (A1 format): ");
       back = in.next();
@@ -332,4 +335,23 @@ public class Game {
     //erase terminal
     System.out.println("\033[2J");
   }
+
+  /*
+  Valid format checker
+  */
+  private boolean isValidCoordinate(String s, int r, int c){ //params: s = input, r = rows, c = columns
+    if (s.length() != 2 || s.length() != 3){
+      return false;
+    }
+    else{
+      if (s.charAt(0) < 65 || s.charAt(0) > 65 + r - 1){
+        return false;
+      }
+      if (Integer.parseInt(s.substring(1)) > c - 1){
+        return false;
+      }
+    }
+    return true;
+  }
+
 }
