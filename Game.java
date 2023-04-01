@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Arrays;
+import java.util.*;
 public class Game {
   private static int[][] playerOneBoard;
   private static ArrayList<Battleship> playerOneShips;
@@ -8,6 +6,9 @@ public class Game {
   private static int[][] playerTwoBoard;
   private static ArrayList<Battleship> playerTwoShips;
   private static int playerTwoShipsLeft;
+  private static int rows = 0;
+  private static int columns = 0;
+  private static boolean powerUp;
   //PLAYER BOARDS: 2d array of numbers. 0 = untouched, 1 = hit, 2 = miss.
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
@@ -15,8 +16,6 @@ public class Game {
   public static void main(String[] args) {
     int turn = 0;
     //To alternate between player turns
-    int rows = 0;
-    int columns = 0;
     //Board setup
     int numberShips = 0;
     //Game setup
@@ -45,6 +44,11 @@ public class Game {
       System.out.println("Please enter a valid amount of ships!");
       numberShips = in.nextInt();
     }
+    System.out.println("Enable power ups? (Yes/No)");
+    input = in.next();
+    powerUp = (input.equals("Yes") || input.equals("Y"));
+
+
     playerOneShipsLeft = numberShips;
     playerTwoShipsLeft = numberShips;
 /*
@@ -72,7 +76,7 @@ public class Game {
       //SET UP COORDINATES
       System.out.println("Front of Ship " + (i + 1) + " (A1 format): ");
       front = in.next();
-      while (front.length() < 1 || front.charAt(0) < 64 || front.charAt(0) > 90 || Integer.parseInt(front.substring(1)) > rows ||  Integer.parseInt(front.substring(1)) < 0) {
+      while (!isValidCoordinate(front)) {
         System.out.println("Please enter in valid A1 format");
         front = in.next();
       }
@@ -80,13 +84,8 @@ public class Game {
 
       System.out.println("Back of Ship " + (i + 1) + " (A1 format): ");
       back = in.next();
-      while (back.length() < 1 || back.charAt(0) < 64 || back.charAt(0) > 90 || Integer.parseInt(back.substring(1)) > rows ||  Integer.parseInt(back.substring(1)) < 0 || (front.charAt(0) != back.charAt(0) && Integer.parseInt(front.substring(1)) != Integer.parseInt(back.substring(1)))) {
-        if (front.charAt(0) != back.charAt(0) || Integer.parseInt(front.substring(1)) != Integer.parseInt(back.substring(1))) {
-          System.out.println("Ship cannot be diagonal, please enter again");
-        }
-        else {
-          System.out.println("Please enter in valid A1 format");
-        }
+      while (!isValidCoordinate(back) || isDiagonal(front, back)) {
+        System.out.println("Please choose a valid coordinate");
         back = in.next();
       }
       //NOTE: Inputs with letters for rows are not checked due to parseInt exception.
@@ -122,20 +121,15 @@ public class Game {
 
       System.out.println("Front of Ship " + (i + 1) + " (A1 format): ");
       front = in.next();
-      while (front.length() < 1 || front.charAt(0) < 64 || front.charAt(0) > 90 || Integer.parseInt(front.substring(1)) > rows ||  Integer.parseInt(front.substring(1)) < 0) {
+      while (!isValidCoordinate(front)) {
         System.out.println("Please enter in valid A1 format");
         front = in.next();
       }
 
       System.out.println("Back of Ship " + (i + 1) + " (A1 format): ");
       back = in.next();
-      while (back.length() < 1 || back.charAt(0) < 64 || back.charAt(0) > 90 || Integer.parseInt(back.substring(1)) > rows ||  Integer.parseInt(back.substring(1)) < 0 || (front.charAt(0) != back.charAt(0) && Integer.parseInt(front.substring(1)) != Integer.parseInt(back.substring(1)))) {
-        if (front.charAt(0) != back.charAt(0) || Integer.parseInt(front.substring(1)) != Integer.parseInt(back.substring(1))) {
-          System.out.println("Ship cannot be diagonal, please enter again");
-        }
-        else {
-          System.out.println("Please enter in valid A1 format");
-        }
+      while (!isValidCoordinate(back) || isDiagonal(front, back)) {
+        System.out.println("Please choose a valid coordinate");
         back = in.next();
       }
 
@@ -166,8 +160,12 @@ public class Game {
         System.out.println("<PLAYER ONE'S BOARD>");
 
         //PROMPT TO CHOOSE TILE
-        System.out.println("PLEASE CHOOSE COORDINATES (EX: A1)");
+        System.out.println("Please choose coordinates (EX: A1)");
         input = in.next();
+        while (!isValidCoordinate(input)) {
+          System.out.println("Please choose valid coordinates");
+          input = in.next();
+        }
 
         //EVALUATING TILE
         int battleshipHit = playerOneBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
@@ -200,8 +198,12 @@ public class Game {
         printBoard(playerTwoBoard, true);
         System.out.println("<PLAYER TWO'S BOARD>");
 
-        System.out.println("PLEASE CHOOSE COORDINATES (EX: A1)");
+        System.out.println("Please choose coordinates (EX: A1)");
         input = in.next();
+        while (!isValidCoordinate(input)) {
+          System.out.println("Please choose valid coordinates");
+          input = in.next();
+        }
 
         int battleshipHit = playerTwoBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
         if (attack(input, playerTwoBoard, playerTwoShips)) {//RETURN HIT MESSAGHE
@@ -339,7 +341,14 @@ public class Game {
   /*
   Valid format checker
   */
-  private boolean isValidCoordinate(String s, int r, int c){ //params: s = input, r = rows, c = columns
+  private static boolean isValidCoordinate(String coord){ //params: s = input, r = rows, c = columns
+    try {
+      return (coord.length() >= 1 && coord.charAt(0) >= 'A' && coord.charAt(0) <= 'Z' && Integer.parseInt(coord.substring(1)) <= rows &&  Integer.parseInt(coord.substring(1)) >= 0);
+    }
+    catch (Exception e) {
+      return false;
+    }
+    /*
     if (s.length() != 2 || s.length() != 3){
       return false;
     }
@@ -352,6 +361,14 @@ public class Game {
       }
     }
     return true;
+    */
   }
-
+  private static boolean isDiagonal(String front, String back){
+    try {
+      return (front.charAt(0) != back.charAt(0) && Integer.parseInt(front.substring(1)) != Integer.parseInt(back.substring(1)));
+    }
+    catch (Exception e) {
+      return true;
+    }
+  }
 }
