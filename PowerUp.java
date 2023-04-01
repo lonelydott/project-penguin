@@ -1,6 +1,6 @@
 import java.util.*;
 import java.io.*;
-public class Weapons{
+public class PowerUp{
 
   //area of impact: 1x1
   public void missile(int[][] board, int row, int col){
