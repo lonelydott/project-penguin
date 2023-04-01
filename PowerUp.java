@@ -3,41 +3,48 @@ import java.io.*;
 public class PowerUp{
 
   //area of impact: 1x1
-  public void missile(int[][] board, int row, int col){
-    if (row > 0 && row < board.length && col > 0 && col < board[0].length && board[row][col] != 1){
-      board[row][col] = 1;
+  public static boolean missile(String input, int[][] board, ArrayList<Battleship> beingAttacked) { //ASSUME IT IS IN A1 FORMAT
+    //DATA FROM COORDINATE
+    int row = Integer.parseInt(input.substring(1, input.length()));
+    int col = input.charAt(0) - 64;
+
+    if (board[row][col] >= 0) { // MISS
+      if (board[row][col] == 0) { //check if tile is empty
+        board[row][col] = 2; //turn tile to O (miss)
+      }
+      return false;
     }
-    else {
-      throw new ArrayIndexOutOfBoundsException();
+    else { // HIT!!!!!
+      int battleshipHit = (board[row][col] * -1) - 1; //Identify battleship
+      beingAttacked.get(battleshipHit).minusOne(); //Find the battleship that got caught, and subtract 1 from its length.
+      board[row][col] = 1; //turn tile to X (hit)
+      return true;
     }
   }
 
-  //area of impact: 3x3, row & col indicate top left box of the nuke
+  //area of impact: +, row & col indicate top left box of the nuke
   //is this in real coordinates or actual indexes?
-  public void nuke(int[][] board, int row, int col){
-    if (row > 0 && row < board.length && col > 0 && col < board[0].length){
-      if (row <= board.length - 3 && col <= board.length - 3){
-        for (int i = row; i < row + 3; i++){
-          for (int j = col; j < col + 3; j++){
-            if(board[row][col] != 1){
-              board[row][col] = 1;
-            }
-          }
-        }
-      }
-      else{
-        for (int i = row; i < board.length; i++){
-          for (int j = row; j < board[0].length; j++){
-            if (board[row][col] != 1){
-              board[row][col] = 1;
-            }
-          }
-        }
-      }
+  public static boolean nuke(String input, int[][] board, ArrayList<Battleship> beingAttacked) { //ASSUME IT IS IN A1 FORMAT
+    int row = Integer.parseInt(input.substring(1, input.length()));
+    int col = input.charAt(0) - 64;
+
+    boolean bool = false;
+    if (nukeHelper(row, col, board, beingAttacked)) {
+      bool = true;
     }
-    else {
-      throw new ArrayIndexOutOfBoundsException();
+    if (nukeHelper(row - 1, col, board, beingAttacked)) {
+      bool = true;
     }
+    if (nukeHelper(row + 1, col, board, beingAttacked)) {
+      bool = true;
+    }
+    if (nukeHelper(row, col - 1, board, beingAttacked)) {
+      bool = true;
+    }
+    if (nukeHelper(row, col + 1, board, beingAttacked)) {
+      bool = true;
+    }
+    return bool;
   }
   //Trying to create a version of nuke that invokes attack
   // public void nuke(int[][] board, int row, int col){
@@ -66,6 +73,24 @@ public class PowerUp{
           }
         }
       }
+    }
+  }
+
+  public static boolean nukeHelper(int row, int col, int[][] board, ArrayList<Battleship> beingAttacked) { //ASSUME IT IS IN A1 FORMAT
+    if (row == 0 || col == 0 || row == board.length || col == board.length) {
+      return false;
+    }
+    if (board[row][col] >= 0) { // MISS
+      if (board[row][col] == 0) { //check if tile is empty
+        board[row][col] = 2; //turn tile to O (miss)
+      }
+      return false;
+    }
+    else { // HIT!!!!!
+      int battleshipHit = (board[row][col] * -1) - 1; //Identify battleship
+      beingAttacked.get(battleshipHit).minusOne(); //Find the battleship that got caught, and subtract 1 from its length.
+      board[row][col] = 1; //turn tile to X (hit)
+      return true;
     }
   }
 }

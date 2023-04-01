@@ -168,23 +168,43 @@ public class Game {
         }
 
         //EVALUATING TILE
-        int battleshipHit = playerOneBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
-        if (attack(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
-          clearTerminal();
-          gotoTop();
-          System.out.println("You hit a ship!");
-          printBoard(playerOneBoard, true);
+        if (powerUp == false) {
+          int battleshipHit = playerOneBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
+          if (PowerUp.missile(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
+            clearTerminal();
+            gotoTop();
+            System.out.println("You hit a ship!");
+            printBoard(playerOneBoard, true);
 
-          //NOTE: the attack() method automatically changes internal length of battleship
-          if (playerOneShips.get(battleshipHit).getLength() == 0) { //checking for last hit
-            playerOneShipsLeft --; //last hit = subtract amount of remaining ships (lose condition)
+            //NOTE: the attack() method automatically changes internal length of battleship
+            if (playerOneShips.get(battleshipHit).getLength() == 0) { //checking for last hit
+              playerOneShipsLeft --; //last hit = subtract amount of remaining ships (lose condition)
+            }
+          }
+          else { //missed
+            clearTerminal();
+            gotoTop();
+            System.out.println("You missed!");
+            printBoard(playerOneBoard, true);
           }
         }
-        else { //missed
-          clearTerminal();
-          gotoTop();
-          System.out.println("You missed!");
-          printBoard(playerOneBoard, true);
+        else {
+          if (PowerUp.nuke(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
+            clearTerminal();
+            gotoTop();
+            System.out.println("You hit a ship!");
+            printBoard(playerOneBoard, true);
+
+            if (isEmpty(playerOneShips)) {
+              playerOneShipsLeft = 0;
+            }
+          }
+          else { //missed
+            clearTerminal();
+            gotoTop();
+            System.out.println("You missed!");
+            printBoard(playerOneBoard, true);
+          }
         }
 
         //Game pause, allow players to see turn result
@@ -205,22 +225,42 @@ public class Game {
           input = in.next();
         }
 
-        int battleshipHit = playerTwoBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
-        if (attack(input, playerTwoBoard, playerTwoShips)) {//RETURN HIT MESSAGHE
-          clearTerminal();
-          gotoTop();
-          System.out.println("You hit a ship!");
-          printBoard(playerTwoBoard, true);
+        if (powerUp == false) {
+          int battleshipHit = playerTwoBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
+          if (attack(input, playerTwoBoard, playerTwoShips)) {//RETURN HIT MESSAGHE
+            clearTerminal();
+            gotoTop();
+            System.out.println("You hit a ship!");
+            printBoard(playerTwoBoard, true);
 
-          if (playerTwoShips.get(battleshipHit).getLength() == 0) {
-            playerTwoShipsLeft --;
+            if (playerTwoShips.get(battleshipHit).getLength() == 0) {
+              playerTwoShipsLeft --;
+            }
+          }
+          else { //RETURN MISS MESSAGE
+            clearTerminal();
+            gotoTop();
+            System.out.println("You missed!");
+            printBoard(playerTwoBoard, true);
           }
         }
-        else { //RETURN MISS MESSAGE
-          clearTerminal();
-          gotoTop();
-          System.out.println("You missed!");
-          printBoard(playerTwoBoard, true);
+        else {
+          if (PowerUp.nuke(input, playerTwoBoard, playerTwoShips)) {//if true, then battleship is hit
+            clearTerminal();
+            gotoTop();
+            System.out.println("You hit a ship!");
+            printBoard(playerTwoBoard, true);
+
+            if (isEmpty(playerTwoShips)) {
+              playerTwoShipsLeft = 0;
+            }
+          }
+          else { //missed
+            clearTerminal();
+            gotoTop();
+            System.out.println("You missed!");
+            printBoard(playerTwoBoard, true);
+          }
         }
 
         System.out.println("PRESS ENTER TO CONTINUE");
@@ -370,5 +410,14 @@ public class Game {
     catch (Exception e) {
       return true;
     }
+  }
+  private static boolean isEmpty(ArrayList<Battleship> list) {
+    boolean bool = true;
+      for (int i = 0; i < list.size() && bool; i ++) {
+        if (list.get(i).getLength() != 0) {
+          bool = false;
+        }
+      }
+      return bool;
   }
 }
