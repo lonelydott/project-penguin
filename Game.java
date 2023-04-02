@@ -9,6 +9,10 @@ public class Game {
   private static int rows = 0;
   private static int columns = 0;
   private static boolean powerUp;
+  private static boolean powerUpChosen;
+  private static boolean nuke = false;
+  private static int numberNukesPlayerOne = 3;
+  private static int numberNukesPlayerTwo = 3;
   //PLAYER BOARDS: 2d array of numbers. 0 = untouched, 1 = hit, 2 = miss.
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
@@ -46,7 +50,7 @@ public class Game {
     }
     System.out.println("Enable power ups? (Yes/No)");
     input = in.next();
-    powerUp = (input.equals("Yes") || input.equals("Y"));
+    powerUp = (input.equalsIgnoreCase("Yes") || input.equalsIgnoreCase("Y"));
 
 
     playerOneShipsLeft = numberShips;
@@ -160,6 +164,30 @@ public class Game {
         System.out.println("<PLAYER ONE'S BOARD>");
 
         //PROMPT TO CHOOSE TILE
+        if (powerUp) {
+          System.out.println("Would you like to use a power up?  (Y/N)");
+          input = in.next();
+          if (input.equalsIgnoreCase("Y")) {
+            System.out.println("Which power up?");
+            System.out.println("(1) Nuke " + "(" + numberNukesPlayerTwo + " remaining)");
+            try {
+              int powerUpSelector = in.nextInt();
+              if (powerUpSelector == 1) {
+                if (numberNukesPlayerTwo > 0) {
+                  nuke = true;
+                  powerUpChosen = true;
+                }
+                else {
+                  System.out.println("You do not have any more nukes.");
+                }
+              }
+            }
+            catch (Exception e) {
+              input = in.next();
+              powerUpChosen = false;
+            }
+          }
+        }
         System.out.println("Please choose coordinates (EX: A1)");
         input = in.next();
         while (!isValidCoordinate(input)) {
@@ -168,7 +196,30 @@ public class Game {
         }
 
         //EVALUATING TILE
-        if (powerUp == false) {
+        if (powerUpChosen) {
+          if (nuke) {
+            if (PowerUp.nuke(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
+              clearTerminal();
+              gotoTop();
+              System.out.println("You hit a ship!");
+              printBoard(playerOneBoard, true);
+
+              if (isEmpty(playerOneShips)) {
+                playerOneShipsLeft = 0;
+              }
+            }
+            else { //missed
+              clearTerminal();
+              gotoTop();
+              System.out.println("You missed!");
+              printBoard(playerOneBoard, true);
+            }
+            nuke = false;
+            numberNukesPlayerTwo --;
+          }
+          powerUpChosen = false;
+        }
+        else {
           int battleshipHit = playerOneBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
           if (PowerUp.missile(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
             clearTerminal();
@@ -179,24 +230,6 @@ public class Game {
             //NOTE: the attack() method automatically changes internal length of battleship
             if (playerOneShips.get(battleshipHit).getLength() == 0) { //checking for last hit
               playerOneShipsLeft --; //last hit = subtract amount of remaining ships (lose condition)
-            }
-          }
-          else { //missed
-            clearTerminal();
-            gotoTop();
-            System.out.println("You missed!");
-            printBoard(playerOneBoard, true);
-          }
-        }
-        else {
-          if (PowerUp.nuke(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
-            clearTerminal();
-            gotoTop();
-            System.out.println("You hit a ship!");
-            printBoard(playerOneBoard, true);
-
-            if (isEmpty(playerOneShips)) {
-              playerOneShipsLeft = 0;
             }
           }
           else { //missed
@@ -218,6 +251,31 @@ public class Game {
         printBoard(playerTwoBoard, true);
         System.out.println("<PLAYER TWO'S BOARD>");
 
+
+        if (powerUp) {
+          System.out.println("Would you like to use a power up?  (Y/N)");
+          input = in.next();
+          if (input.equalsIgnoreCase("Y")) {
+            System.out.println("Which power up?");
+            System.out.println("(1) Nuke " + "(" + numberNukesPlayerOne + " remaining)");
+            try {
+              int powerUpSelector = in.nextInt();
+              if (powerUpSelector == 1) {
+                if (numberNukesPlayerOne > 0) {
+                  nuke = true;
+                  powerUpChosen = true;
+                }
+                else {
+                  System.out.println("You do not have any more nukes.");
+                }
+              }
+            }
+            catch (Exception e) {
+              input = in.next();
+              powerUpChosen = false;
+            }
+          }
+        }
         System.out.println("Please choose coordinates (EX: A1)");
         input = in.next();
         while (!isValidCoordinate(input)) {
@@ -225,34 +283,40 @@ public class Game {
           input = in.next();
         }
 
-        if (powerUp == false) {
-          int battleshipHit = playerTwoBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
-          if (attack(input, playerTwoBoard, playerTwoShips)) {//RETURN HIT MESSAGHE
-            clearTerminal();
-            gotoTop();
-            System.out.println("You hit a ship!");
-            printBoard(playerTwoBoard, true);
+        if (powerUpChosen) {
+          if (nuke) {
+            if (PowerUp.nuke(input, playerTwoBoard, playerTwoShips)) {//if true, then battleship is hit
+              clearTerminal();
+              gotoTop();
+              System.out.println("You hit a ship!");
+              printBoard(playerTwoBoard, true);
 
-            if (playerTwoShips.get(battleshipHit).getLength() == 0) {
-              playerTwoShipsLeft --;
+              if (isEmpty(playerTwoShips)) {
+                playerTwoShipsLeft = 0;
+              }
             }
+            else { //missed
+              clearTerminal();
+              gotoTop();
+              System.out.println("You missed!");
+              printBoard(playerTwoBoard, true);
+            }
+            nuke = false;
+            numberNukesPlayerOne --;
           }
-          else { //RETURN MISS MESSAGE
-            clearTerminal();
-            gotoTop();
-            System.out.println("You missed!");
-            printBoard(playerTwoBoard, true);
-          }
+          powerUpChosen = false;
         }
         else {
-          if (PowerUp.nuke(input, playerTwoBoard, playerTwoShips)) {//if true, then battleship is hit
+          int battleshipHit = playerTwoBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
+          if (PowerUp.missile(input, playerTwoBoard, playerTwoShips)) {//if true, then battleship is hit
             clearTerminal();
             gotoTop();
             System.out.println("You hit a ship!");
             printBoard(playerTwoBoard, true);
 
-            if (isEmpty(playerTwoShips)) {
-              playerTwoShipsLeft = 0;
+            //NOTE: the attack() method automatically changes internal length of battleship
+            if (playerTwoShips.get(battleshipHit).getLength() == 0) { //checking for last hit
+              playerTwoShipsLeft --; //last hit = subtract amount of remaining ships (lose condition)
             }
           }
           else { //missed
