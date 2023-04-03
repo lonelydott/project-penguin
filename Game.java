@@ -17,6 +17,21 @@ public class Game {
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
 
+  public static boolean isValid(String x, int low, int high){ //x is the String being tested, low to high is the numeric range (inclusive on both ends)
+    int y;
+    try{
+      y = Integer.parseInt(x);
+    }
+    catch(NumberFormatException e){
+      y = 0;
+    }
+    if (y >= low && y <= high){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
   public static void main(String[] args) {
     int turn = 0;
     //To alternate between player turns
@@ -31,26 +46,36 @@ public class Game {
     clearTerminal();
     gotoTop();
     System.out.println("How many rows?"); //ROWS
-    rows = in.nextInt();
-    while(rows <= 0 || rows > 26) {
+    String inputRows = in.next();
+    while(!isValid(inputRows, 1, 26)) {
       System.out.println("Please enter a valid amount of rows! (1-26)");
-      rows = in.nextInt();
+      inputRows = in.next();
     }
+    rows = Integer.parseInt(inputRows);
+
     System.out.println("How many columns?"); //COLUMNS
-    columns = in.nextInt();
-    while(columns <= 0 || columns > 26) {
+    String inputCols = in.next();
+    while(!isValid(inputCols, 1, 26)) {
       System.out.println("Please enter a valid amount of columns! (1-26)");
-      columns = in.nextInt();
+      inputCols = in.next();
     }
-    System.out.println("How many ships per player?"); //SHIPS
-    numberShips = in.nextInt();
-    while(numberShips <= 0){
-      System.out.println("Please enter a valid amount of ships!");
-      numberShips = in.nextInt();
+    columns = Integer.parseInt(inputCols);
+
+    System.out.println("How many ships per player? (perferably less than 10)"); //SHIPS
+    String inputNumberShips = in.next();
+    while(!isValid(inputNumberShips, 1, 10)) {
+      System.out.println("Please enter a valid amount of ships! (1-10)");
+      inputNumberShips = in.next();
     }
-    System.out.println("Enable power ups? (Yes/No)");
+    numberShips = Integer.parseInt(inputNumberShips);
+
+    System.out.println("Enable power ups? (Y/N)");
     input = in.next();
-    powerUp = (input.equalsIgnoreCase("Yes") || input.equalsIgnoreCase("Y"));
+    while(!((input.equals("Y")) || input.equals("N"))) {
+      System.out.println("Please enter Y/N!");
+      input = in.next();
+    }
+    powerUp = (input.equals("Y"));
 
 
     playerOneShipsLeft = numberShips;
