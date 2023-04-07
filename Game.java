@@ -13,6 +13,7 @@ public class Game {
   private static boolean nuke = false;
   private static int numberNukesPlayerOne = 3;
   private static int numberNukesPlayerTwo = 3;
+  private static ArrayList<String> spotsTaken;
   //PLAYER BOARDS: 2d array of numbers. 0 = untouched, 1 = hit, 2 = miss.
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
@@ -103,7 +104,7 @@ public class Game {
       String back = "";
 
       //SET UP COORDINATES
-      System.out.println("Front of Ship " + (i + 1) + " (A1 format): ");
+      System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
       front = in.next();
       while (!isValidCoordinate(front)) {
         System.out.println("Please enter in valid A1 format");
@@ -111,10 +112,10 @@ public class Game {
       }
 
 
-      System.out.println("Back of Ship " + (i + 1) + " (A1 format): ");
+      System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
       back = in.next();
-      while (!isValidCoordinate(back) || isDiagonal(front, back)) {
-        System.out.println("Please choose a valid coordinate");
+      while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2)) {
+        System.out.println("Please choose a valid coordinate for length " + (i+2));
         back = in.next();
       }
       //NOTE: Inputs with letters for rows are not checked due to parseInt exception.
@@ -123,6 +124,7 @@ public class Game {
       //FINISHING GAME SETUP: finishing board layout with ships and populating arraylist
       playerOneShips.add(new Battleship(front, back)); //arraylist
       playerOneShips.get(i).place(playerOneBoard, (i + 1) * -1); //placing ships on board
+//      System.out.println(Arrays.toString(playerOneBoard));
       clearTerminal();
       gotoTop();
       printBoard(playerOneBoard, false);
@@ -148,17 +150,18 @@ public class Game {
       String front = "";
       String back = "";
 
-      System.out.println("Front of Ship " + (i + 1) + " (A1 format): ");
+      System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
       front = in.next();
       while (!isValidCoordinate(front)) {
         System.out.println("Please enter in valid A1 format");
         front = in.next();
       }
 
-      System.out.println("Back of Ship " + (i + 1) + " (A1 format): ");
+
+      System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
       back = in.next();
-      while (!isValidCoordinate(back) || isDiagonal(front, back)) {
-        System.out.println("Please choose a valid coordinate");
+      while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2)) {
+        System.out.println("Please choose a valid coordinate for length " + (i+2));
         back = in.next();
       }
 
@@ -508,5 +511,18 @@ public class Game {
         }
       }
       return bool;
+  }
+  private static boolean lengthCheck(String front, String back, int length){
+    try{
+      if (front.charAt(0) != back.charAt(0) || Integer.parseInt(front.substring(1)) != Integer.parseInt(back.substring(1))){
+//        System.out.println(Math.abs(front.charAt(0) - back.charAt(0)));
+//        System.out.println(Math.abs (Integer.parseInt(front.substring(1)) - Integer.parseInt(back.substring(1))) );
+        return (Math.abs(front.charAt(0) - back.charAt(0)) == length-1 || Math.abs(Integer.parseInt(front.substring(1)) - Integer.parseInt(back.substring(1))) == length-1);
+      }
+//      return (front.charAt(0) == back.charAt(0) && Math.abs(Integer.parseInt(front.substring(1)) - Integer.parseInt(back.substring(1))) != length) || (front.charAt(0) - back.charAt(0) != length && Math.abs(Integer.parseInt(front.substring(1)) == Integer.parseInt(back.substring(1))));
+    }
+    catch (Exception e) {
+    }
+    return false;
   }
 }
