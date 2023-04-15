@@ -49,8 +49,7 @@ public class Game {
     if (args.length == 4) {
       rows = Integer.parseInt(args[0]);
       columns = Integer.parseInt(args[1]);
-      playerOneShipsLeft = Integer.parseInt(args[2]);
-      playerTwoShipsLeft = Integer.parseInt(args[2]);
+      numberShips = Integer.parseInt(args[2]);
       powerUp = (args[3].equals("Y"));
     }
     else {
