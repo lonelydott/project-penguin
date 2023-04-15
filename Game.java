@@ -46,37 +46,46 @@ public class Game {
     //INITIAL GAME SETUP
     clearTerminal();
     gotoTop();
-    System.out.println("How many rows?"); //ROWS
-    String inputRows = in.next();
-    while(!isValid(inputRows, 1, 26)) {
-      System.out.println("Please enter a valid amount of rows! (1-26)");
-      inputRows = in.next();
+    if (args.length == 4) {
+      rows = Integer.parseInt(args[0]);
+      columns = Integer.parseInt(args[1]);
+      playerOneShipsLeft = Integer.parseInt(args[2]);
+      playerTwoShipsLeft = Integer.parseInt(args[2]);
+      powerUp = (args[3].equals("Y"));
     }
-    rows = Integer.parseInt(inputRows);
+    else {
+      System.out.println("How many rows?"); //ROWS
+      String inputRows = in.next();
+      while(!isValid(inputRows, 1, 26)) {
+        System.out.println("Please enter a valid amount of rows! (1-26)");
+        inputRows = in.next();
+      }
+      rows = Integer.parseInt(inputRows);
 
-    System.out.println("How many columns?"); //COLUMNS
-    String inputCols = in.next();
-    while(!isValid(inputCols, 1, 26)) {
-      System.out.println("Please enter a valid amount of columns! (1-26)");
-      inputCols = in.next();
-    }
-    columns = Integer.parseInt(inputCols);
+      System.out.println("How many columns?"); //COLUMNS
+      String inputCols = in.next();
+      while(!isValid(inputCols, 1, 26)) {
+        System.out.println("Please enter a valid amount of columns! (1-26)");
+        inputCols = in.next();
+      }
+      columns = Integer.parseInt(inputCols);
 
-    System.out.println("How many ships per player? (perferably less than 10)"); //SHIPS
-    String inputNumberShips = in.next();
-    while(!isValid(inputNumberShips, 1, 10)) {
-      System.out.println("Please enter a valid amount of ships! (1-10)");
-      inputNumberShips = in.next();
-    }
-    numberShips = Integer.parseInt(inputNumberShips);
+      System.out.println("How many ships per player? (perferably less than 10)"); //SHIPS
+      String inputNumberShips = in.next();
+      while(!isValid(inputNumberShips, 1, 10)) {
+        System.out.println("Please enter a valid amount of ships! (1-10)");
+        inputNumberShips = in.next();
+      }
+      numberShips = Integer.parseInt(inputNumberShips);
 
-    System.out.println("Enable power ups? (Y/N)");
-    input = in.next();
-    while(!((input.equals("Y")) || input.equals("N"))) {
-      System.out.println("Please enter Y/N!");
+      System.out.println("Enable power ups? (Y/N)");
       input = in.next();
+      while(!((input.equals("Y")) || input.equals("N"))) {
+        System.out.println("Please enter Y/N!");
+        input = in.next();
+      }
+      powerUp = (input.equals("Y"));
     }
-    powerUp = (input.equals("Y"));
 
 
     playerOneShipsLeft = numberShips;
@@ -297,7 +306,8 @@ public class Game {
       System.out.println("THEIR BOARD:");
       printBoard(playerOneBoard, false);
     }
-    //NOTES: IMPROVE VICTORY SCREEN? PIXEL ART IF ENOUGH TIME AND PATIENCE. COLORS ARE POSSIBLE
+
+    System.out.println("This game took " + turn + " turns to complete.");
   }
 
   //BOARD METHODS
