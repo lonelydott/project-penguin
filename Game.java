@@ -522,7 +522,9 @@ public class Game {
       }
       else {
         if (Integer.parseInt(front.substring(1)) <= list.get(index).getBackY() && Integer.parseInt(front.substring(1)) >= list.get(index).getFrontY()) {
-          return true;
+          if (front.charAt(0) - 64 <= list.get(index).getBackX() && front.charAt(0) - 64 >= list.get(index).getFrontX()) {
+            return true;
+          }
         }
       }
     }
