@@ -14,6 +14,7 @@ public class Game {
   private static int numberNukesPlayerOne = 3;
   private static int numberNukesPlayerTwo = 3;
   private static ArrayList<String> spotsTaken;
+  private static int numberShips = 0;
   //PLAYER BOARDS: 2d array of numbers. 0 = untouched, 1 = hit, 2 = miss.
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
@@ -37,7 +38,6 @@ public class Game {
     int turn = 0;
     //To alternate between player turns
     //Board setup
-    int numberShips = 0;
     //Game setup
     String input = "";
     Scanner in = new Scanner(System.in);
@@ -98,87 +98,12 @@ public class Game {
 
 
     System.out.println("PLAYER ONE: CREATE YOUR SHIPS"); //PLAYER ONE
-    printBoard(playerOneBoard, false);
-    for (int i = 0; i < numberShips; i ++) {
-      String front = "";
-      String back = "";
-
-      //SET UP COORDINATES
-      System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
-      front = in.next();
-      while (!isValidCoordinate(front)) {
-        System.out.println("Please enter in valid A1 format");
-        front = in.next();
-      }
-
-
-      System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
-      back = in.next();
-      while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2)) {
-        System.out.println("Please choose a valid coordinate for length " + (i+2));
-        back = in.next();
-      }
-      //NOTE: Inputs with letters for rows are not checked due to parseInt exception.
-      //NOTE: If statement should be significantly shortened
-
-      //FINISHING GAME SETUP: finishing board layout with ships and populating arraylist
-      playerOneShips.add(new Battleship(front, back)); //arraylist
-      playerOneShips.get(i).place(playerOneBoard, (i + 1) * -1); //placing ships on board
-//      System.out.println(Arrays.toString(playerOneBoard));
-      clearTerminal();
-      gotoTop();
-      printBoard(playerOneBoard, false);
-    }
-
-    //GAME SET UP: Announcing final board to player 1
-    System.out.println("YOUR FINAL BOARD");
-    for (int i = 0; i < playerOneShips.size(); i ++) { //coordinates of every ship
-      System.out.println("(Battleship " + (i + 1) + ") " + playerOneShips.get(i));
-    }
-    System.out.println("PRESS ENTER TO CONTINUE");
-    in.nextLine();
-    in.nextLine();
-
-    clearTerminal();
-    gotoTop();
+    place(playerOneBoard, playerOneShips);
 
     //NOTE: Player two setup is very similar, if not identical, to player one setup. Therefore, issues with player 1 are consistent with issues with player 2.
     //NOTE: Due to similarities between each player, transforming this into a function could be possible (3+ players?) (potential custom gamemode?) (allow players to choose who to attack?)
     System.out.println("PLAYER TWO: CREATE YOUR SHIPS"); //PLAYER TWO
-    printBoard(playerTwoBoard, false);
-    for (int i = 0; i < numberShips; i ++) {
-      String front = "";
-      String back = "";
-
-      System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
-      front = in.next();
-      while (!isValidCoordinate(front)) {
-        System.out.println("Please enter in valid A1 format");
-        front = in.next();
-      }
-
-
-      System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
-      back = in.next();
-      while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2)) {
-        System.out.println("Please choose a valid coordinate for length " + (i+2));
-        back = in.next();
-      }
-
-      playerTwoShips.add(new Battleship(front, back));
-      playerTwoShips.get(i).place(playerTwoBoard, (i + 1) * -1);
-      clearTerminal();
-      gotoTop();
-      printBoard(playerTwoBoard, false);
-    }
-
-    System.out.println("YOUR FINAL BOARD");
-    for (int i = 0; i < playerTwoShips.size(); i ++) {
-      System.out.println("(Battleship " + (i + 1) + ") " + playerTwoShips.get(i));
-    }
-    System.out.println("PRESS ENTER TO CONTINUE");
-    in.nextLine();
-    in.nextLine();
+    place(playerTwoBoard, playerTwoShips);
 
     //BOMBING PHASE (AFTER PLACING SHIPS)
     while(playerOneShipsLeft > 0 && playerTwoShipsLeft > 0){ //GAME CONTINUES AS LONG AS ALL PLAYERS HAVE SHIPS LEFT ON THEIR BOARD
@@ -377,6 +302,65 @@ public class Game {
 
   //BOARD METHODS
   //BOARD CREATION
+  public static void place(int[][] board, ArrayList<Battleship> shipList) {
+    Scanner in = new Scanner(System.in);
+    printBoard(board, false);
+    for (int i = 0; i < numberShips; i ++) {
+      String front = "";
+      String back = "";
+
+      //SET UP COORDINATES
+      System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
+      front = in.next();
+      while (!isValidCoordinate(front)) {
+        System.out.println("Please enter in valid A1 format");
+        front = in.next();
+      }
+
+
+      System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
+      back = in.next();
+      while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, shipList)) {
+        if (back.equals("cancel")) {
+          System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
+          front = in.next();
+          while (!isValidCoordinate(front)) {
+            System.out.println("Please enter in valid A1 format");
+            front = in.next();
+          }
+        }
+        System.out.println("Please choose a valid coordinate for length " + (i+2));
+        back = in.next();
+      }
+
+      if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
+        String swap = front;
+        front = back;
+        back = swap;
+      }
+
+      //FINISHING GAME SETUP: finishing board layout with ships and populating arraylist
+      shipList.add(new Battleship(front, back)); //arraylist
+      shipList.get(i).place(board, (i + 1) * -1); //placing ships on board
+//      System.out.println(Arrays.toString(playerOneBoard));
+      clearTerminal();
+      gotoTop();
+      printBoard(board, false);
+    }
+
+    //GAME SET UP: Announcing final board to player 1
+    System.out.println("YOUR FINAL BOARD");
+    for (int i = 0; i < shipList.size(); i ++) { //coordinates of every ship
+      System.out.println("(Battleship " + (i + 1) + ") " + shipList.get(i));
+    }
+    System.out.println("PRESS ENTER TO CONTINUE");
+    in.nextLine();
+    in.nextLine();
+
+    clearTerminal();
+    gotoTop();
+  }
+
   public static int[][] createBoard(int row, int col) {//row, col = dimensions of board
     int[][] board = new int[row + 1][col + 1];
     for (int i = 1; i <= row; i ++) {
@@ -522,6 +506,25 @@ public class Game {
 //      return (front.charAt(0) == back.charAt(0) && Math.abs(Integer.parseInt(front.substring(1)) - Integer.parseInt(back.substring(1))) != length) || (front.charAt(0) - back.charAt(0) != length && Math.abs(Integer.parseInt(front.substring(1)) == Integer.parseInt(back.substring(1))));
     }
     catch (Exception e) {
+    }
+    return false;
+  }
+  private static boolean overlap(String front, String back, ArrayList<Battleship> list) {
+    boolean vertical = false;
+    if (front.substring(0, 1).equals(back.substring(0, 1))) {
+      vertical = true;
+    }
+    for (int index = 0; index < list.size(); index ++) {
+      if (vertical) {
+        if (front.charAt(0) - 64 <= list.get(index).getBackX() && front.charAt(0) - 64 >= list.get(index).getFrontX()) {
+          return true;
+        }
+      }
+      else {
+        if (Integer.parseInt(front.substring(1)) <= list.get(index).getBackY() && Integer.parseInt(front.substring(1)) >= list.get(index).getFrontY()) {
+          return true;
+        }
+      }
     }
     return false;
   }
