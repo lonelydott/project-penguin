@@ -128,6 +128,10 @@ public class Game {
         if (powerUp) {
           System.out.println("Would you like to use a power up?  (Y/N)");
           input = in.next();
+          while (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")){
+            System.out.println("Would you like to use a power up?  (Y/N)");
+            input = in.next();
+          }
           if (input.equalsIgnoreCase("Y")) {
             System.out.println("Which power up?");
             System.out.println("(1) Nuke " + "(" + numberNukesPlayerTwo + " remaining)");
@@ -216,6 +220,10 @@ public class Game {
         if (powerUp) {
           System.out.println("Would you like to use a power up?  (Y/N)");
           input = in.next();
+          while (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")){
+            System.out.println("Would you like to use a power up?  (Y/N)");
+            input = in.next();
+          }
           if (input.equalsIgnoreCase("Y")) {
             System.out.println("Which power up?");
             System.out.println("(1) Nuke " + "(" + numberNukesPlayerOne + " remaining)");
