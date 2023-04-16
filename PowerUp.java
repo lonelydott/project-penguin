@@ -8,8 +8,9 @@ public class PowerUp{
     numberNukes = 1;
     numberTraps = 1;
   }
-  public PowerUp(int nukes) {
+  public PowerUp(int nukes, int traps) {
     numberNukes = nukes;
+    numberTraps = traps;
   }
   public int getNukes() {
     return numberNukes;
