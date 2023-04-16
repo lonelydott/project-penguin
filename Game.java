@@ -391,11 +391,11 @@ public class Game {
         }
         Battleship trap = new Battleship(front, back);
         trap.place(board, 3);
-      }
 
-      clearTerminal();
-      gotoTop();
-      printBoard(board, false);
+        clearTerminal();
+        gotoTop();
+        printBoard(board, false);
+      }
     }
 
     //GAME SET UP: Announcing final board to player 1
