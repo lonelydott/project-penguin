@@ -2,9 +2,11 @@ import java.util.*;
 import java.io.*;
 public class PowerUp{
   private int numberNukes;
+  private int numberTraps;
 
   public PowerUp() {
     numberNukes = 1;
+    numberTraps = 1;
   }
   public PowerUp(int nukes) {
     numberNukes = nukes;
@@ -14,6 +16,9 @@ public class PowerUp{
   }
   public void useNuke() {
     numberNukes --;
+  }
+  public int getTraps() {
+    return numberTraps;
   }
 
   //area of impact: 1x1
@@ -25,6 +30,10 @@ public class PowerUp{
     if (board[row][col] >= 0) { // MISS
       if (board[row][col] == 0) { //check if tile is empty
         board[row][col] = 2; //turn tile to O (miss)
+      }
+      if (board[row][col] == 3) {
+        board[row][col] = 1;
+        return true;
       }
       return false;
     }
@@ -72,7 +81,7 @@ public class PowerUp{
   //     }
   //   }
   // }
-  public static Battleship landmine(String xcor, String ycor){ //creates a 1x1 ship as bait to throwoff the enemy player
+  public static Battleship trap(String xcor, String ycor){ //creates a 1x1 ship as bait to throwoff the enemy player
     Battleship bait = new Battleship(xcor, ycor);
     return bait;
   }
@@ -97,6 +106,10 @@ public class PowerUp{
     if (board[row][col] >= 0) { // MISS
       if (board[row][col] == 0) { //check if tile is empty
         board[row][col] = 2; //turn tile to O (miss)
+      }
+      if (board[row][col] == 3) {
+        board[row][col] = 1;
+        return true;
       }
       return false;
     }

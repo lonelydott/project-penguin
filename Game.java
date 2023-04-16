@@ -91,12 +91,12 @@ public class Game {
 
 
     System.out.println("PLAYER ONE: CREATE YOUR SHIPS"); //PLAYER ONE
-    place(playerOneBoard, playerOneShips);
+    place(playerOneBoard, playerOneShips, playerOne);
 
     //NOTE: Player two setup is very similar, if not identical, to player one setup. Therefore, issues with player 1 are consistent with issues with player 2.
     //NOTE: Due to similarities between each player, transforming this into a function could be possible (3+ players?) (potential custom gamemode?) (allow players to choose who to attack?)
     System.out.println("PLAYER TWO: CREATE YOUR SHIPS"); //PLAYER TWO
-    place(playerTwoBoard, playerTwoShips);
+    place(playerTwoBoard, playerTwoShips, playerTwo);
 
     //BOMBING PHASE (AFTER PLACING SHIPS)
     while(playerOneShipsLeft > 0 && playerTwoShipsLeft > 0){ //GAME CONTINUES AS LONG AS ALL PLAYERS HAVE SHIPS LEFT ON THEIR BOARD
@@ -176,7 +176,7 @@ public class Game {
             printBoard(playerOneBoard, true);
 
             //NOTE: the attack() method automatically changes internal length of battleship
-            if (playerOneShips.get(battleshipHit).getLength() == 0) { //checking for last hit
+            if (battleshipHit != -4 && playerOneShips.get(battleshipHit).getLength() == 0) { //checking for last hit
               playerOneShipsLeft --; //last hit = subtract amount of remaining ships (lose condition)
             }
           }
@@ -265,7 +265,7 @@ public class Game {
             printBoard(playerTwoBoard, true);
 
             //NOTE: the attack() method automatically changes internal length of battleship
-            if (playerTwoShips.get(battleshipHit).getLength() == 0) { //checking for last hit
+            if (battleshipHit != -4 && playerTwoShips.get(battleshipHit).getLength() == 0) { //checking for last hit
               playerTwoShipsLeft --; //last hit = subtract amount of remaining ships (lose condition)
             }
           }
@@ -314,13 +314,12 @@ public class Game {
       return false;
     }
   }
-  public static void place(int[][] board, ArrayList<Battleship> shipList) {
+  public static void place(int[][] board, ArrayList<Battleship> shipList, PowerUp player) {
     Scanner in = new Scanner(System.in);
+    String front = "";
+    String back = "";
     printBoard(board, false);
     for (int i = 0; i < numberShips; i ++) {
-      String front = "";
-      String back = "";
-
       //SET UP COORDINATES
       System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
       front = in.next();
@@ -353,8 +352,47 @@ public class Game {
 
       //FINISHING GAME SETUP: finishing board layout with ships and populating arraylist
       shipList.add(new Battleship(front, back)); //arraylist
-      shipList.get(i).place(board, (i + 1) * -1); //placing ships on board
+      shipList.get(i).place(board, (i + 1) * -1); //placing ships on board... this place is a place method from another class
 //      System.out.println(Arrays.toString(playerOneBoard));
+      clearTerminal();
+      gotoTop();
+      printBoard(board, false);
+    }
+
+    if (powerUpEnabled) {
+      for (int i = 0; i < player.getTraps(); i ++) {
+        System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
+        front = in.next();
+        while (!isValidCoordinate(front)) {
+          System.out.println("Please enter in valid A1 format");
+          front = in.next();
+        }
+
+
+        System.out.println("Back of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
+        back = in.next();
+        while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, shipList)) {
+          if (back.equals("cancel")) {
+            System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
+            front = in.next();
+            while (!isValidCoordinate(front)) {
+              System.out.println("Please enter in valid A1 format");
+              front = in.next();
+            }
+          }
+          System.out.println("Please choose a valid coordinate for length " + (i+2));
+          back = in.next();
+        }
+
+        if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
+          String swap = front;
+          front = back;
+          back = swap;
+        }
+        Battleship trap = new Battleship(front, back);
+        trap.place(board, 3);
+      }
+
       clearTerminal();
       gotoTop();
       printBoard(board, false);
@@ -389,7 +427,7 @@ public class Game {
     return board; //board finished
   }
 
-  //NOTE: 0 = untouched, 1 = hit, 2 = miss, -n = nth battleship
+  //NOTE: 0 = untouched, 1 = hit, 2 = miss, -n = nth battleship, 3 = trap???
   //NOTE: Purpose is to be convert board variables (purely for information) into human-friendly/easier-to-digest data
   public static void printBoard(int[][] board, boolean concealed) {//concealed is true = hide battleships. concealed is false = show battleships.
     for (int i = 0; i < board.length; i ++) {
@@ -411,6 +449,9 @@ public class Game {
             else {
               if (concealed || board[i][j] == 0) {
                 System.out.print(" "); //print empties (concealed)
+              }
+              else if (board[i][j] == 3) {
+                System.out.print("T"); //prints traps
               }
               else {
                 System.out.print(board[i][j] * -1); //print ships (not concealed)
