@@ -8,32 +8,14 @@ public class Game {
   private static int playerTwoShipsLeft;
   private static int rows = 0;
   private static int columns = 0;
-  private static boolean powerUp;
+  private static boolean powerUpEnabled;
   private static boolean powerUpChosen;
-  private static boolean nuke = false;
-  private static int numberNukesPlayerOne = 3;
-  private static int numberNukesPlayerTwo = 3;
-  private static ArrayList<String> spotsTaken;
+  //private static ArrayList<String> spotsTaken;
   private static int numberShips = 0;
   //PLAYER BOARDS: 2d array of numbers. 0 = untouched, 1 = hit, 2 = miss.
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
 
-  public static boolean isValid(String x, int low, int high){ //x is the String being tested, low to high is the numeric range (inclusive on both ends)
-    int y;
-    try{
-      y = Integer.parseInt(x);
-    }
-    catch(NumberFormatException e){
-      y = 0;
-    }
-    if (y >= low && y <= high){
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
   public static void main(String[] args) {
     int turn = 0;
     //To alternate between player turns
@@ -50,7 +32,7 @@ public class Game {
       rows = Integer.parseInt(args[0]);
       columns = Integer.parseInt(args[1]);
       numberShips = Integer.parseInt(args[2]);
-      powerUp = (args[3].equals("Y"));
+      powerUpEnabled = (args[3].equals("Y"));
     }
     else {
       System.out.println("How many rows?"); //ROWS
@@ -83,9 +65,12 @@ public class Game {
         System.out.println("Please enter Y/N!");
         input = in.next();
       }
-      powerUp = (input.equals("Y"));
+      powerUpEnabled = (input.equals("Y"));
     }
 
+    PowerUp playerOne = new PowerUp();
+    PowerUp playerTwo = new PowerUp();
+    int powerUpSelector = 0;
 
     playerOneShipsLeft = numberShips;
     playerTwoShipsLeft = numberShips;
@@ -125,7 +110,7 @@ public class Game {
         System.out.println("<PLAYER ONE'S BOARD>");
 
         //PROMPT TO CHOOSE TILE
-        if (powerUp) {
+        if (powerUpEnabled) {
           System.out.println("Would you like to use a power up?  (Y/N)");
           input = in.next();
           while (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")){
@@ -134,12 +119,11 @@ public class Game {
           }
           if (input.equalsIgnoreCase("Y")) {
             System.out.println("Which power up?");
-            System.out.println("(1) Nuke " + "(" + numberNukesPlayerTwo + " remaining)");
+            System.out.println("(1) Nuke " + "(" + playerTwo.getNukes() + " remaining)");
             try {
-              int powerUpSelector = in.nextInt();
+              powerUpSelector = in.nextInt();
               if (powerUpSelector == 1) {
-                if (numberNukesPlayerTwo > 0) {
-                  nuke = true;
+                if (playerTwo.getNukes() > 0) {
                   powerUpChosen = true;
                 }
                 else {
@@ -162,7 +146,7 @@ public class Game {
 
         //EVALUATING TILE
         if (powerUpChosen) {
-          if (nuke) {
+          if (powerUpSelector == 1) {
             if (PowerUp.nuke(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
               clearTerminal();
               gotoTop();
@@ -179,8 +163,7 @@ public class Game {
               System.out.println("You missed!");
               printBoard(playerOneBoard, true);
             }
-            nuke = false;
-            numberNukesPlayerTwo --;
+            playerTwo.useNuke();
           }
           powerUpChosen = false;
         }
@@ -217,7 +200,7 @@ public class Game {
         System.out.println("<PLAYER TWO'S BOARD>");
 
 
-        if (powerUp) {
+        if (powerUpEnabled) {
           System.out.println("Would you like to use a power up?  (Y/N)");
           input = in.next();
           while (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")){
@@ -226,12 +209,11 @@ public class Game {
           }
           if (input.equalsIgnoreCase("Y")) {
             System.out.println("Which power up?");
-            System.out.println("(1) Nuke " + "(" + numberNukesPlayerOne + " remaining)");
+            System.out.println("(1) Nuke " + "(" + playerOne.getNukes() + " remaining)");
             try {
-              int powerUpSelector = in.nextInt();
+              powerUpSelector = in.nextInt();
               if (powerUpSelector == 1) {
-                if (numberNukesPlayerOne > 0) {
-                  nuke = true;
+                if (playerOne.getNukes() > 0) {
                   powerUpChosen = true;
                 }
                 else {
@@ -253,7 +235,7 @@ public class Game {
         }
 
         if (powerUpChosen) {
-          if (nuke) {
+          if (powerUpSelector == 1) {
             if (PowerUp.nuke(input, playerTwoBoard, playerTwoShips)) {//if true, then battleship is hit
               clearTerminal();
               gotoTop();
@@ -270,8 +252,7 @@ public class Game {
               System.out.println("You missed!");
               printBoard(playerTwoBoard, true);
             }
-            nuke = false;
-            numberNukesPlayerOne --;
+            playerOne.useNuke();
           }
           powerUpChosen = false;
         }
@@ -317,8 +298,22 @@ public class Game {
     System.out.println("This game took " + turn + " turns to complete.");
   }
 
-  //BOARD METHODS
-  //BOARD CREATION
+
+  public static boolean isValid(String x, int low, int high){ //x is the String being tested, low to high is the numeric range (inclusive on both ends)
+    int y;
+    try{
+      y = Integer.parseInt(x);
+    }
+    catch(NumberFormatException e){
+      y = 0;
+    }
+    if (y >= low && y <= high){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
   public static void place(int[][] board, ArrayList<Battleship> shipList) {
     Scanner in = new Scanner(System.in);
     printBoard(board, false);

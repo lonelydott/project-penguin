@@ -1,6 +1,20 @@
 import java.util.*;
 import java.io.*;
 public class PowerUp{
+  private int numberNukes;
+
+  public PowerUp() {
+    numberNukes = 1;
+  }
+  public PowerUp(int nukes) {
+    numberNukes = nukes;
+  }
+  public int getNukes() {
+    return numberNukes;
+  }
+  public void useNuke() {
+    numberNukes --;
+  }
 
   //area of impact: 1x1
   public static boolean missile(String input, int[][] board, ArrayList<Battleship> beingAttacked) { //ASSUME IT IS IN A1 FORMAT
