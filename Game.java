@@ -445,6 +445,9 @@ public class Game {
           else {
             if (j == 0) {
               System.out.print(board[i][j]); //print row indicators
+              if (board[i][j] < 10 && rows >= 10) { // spacing
+                System.out.print(" ");
+              }
             }
             else {
               if (concealed || board[i][j] == 0) {
