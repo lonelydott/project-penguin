@@ -3,14 +3,17 @@ import java.io.*;
 public class PowerUp{
   private int numberNukes;
   private int numberTraps;
+  private int numberSonars;
 
   public PowerUp() {
     numberNukes = 1;
     numberTraps = 1;
+    numberSonars = 2;
   }
-  public PowerUp(int nukes, int traps) {
+  public PowerUp(int nukes, int traps, int sonars) {
     numberNukes = nukes;
     numberTraps = traps;
+    numberSonars = sonars;
   }
   public int getNukes() {
     return numberNukes;
@@ -20,6 +23,9 @@ public class PowerUp{
   }
   public int getTraps() {
     return numberTraps;
+  }
+  public int getSonars() {
+    return numberSonars;
   }
 
   //area of impact: 1x1
@@ -86,17 +92,46 @@ public class PowerUp{
     Battleship bait = new Battleship(xcor, ycor);
     return bait;
   }
-  public static void sonar(int[][] board, String coord){ //creates a 1x1 ship as bait to throwoff the enemy player
+  public static void sonar(String coord, int[][] board){ //creates a 1x1 ship as bait to throwoff the enemy player
     int row = Integer.parseInt(coord.substring(1, coord.length()));
     int col = coord.charAt(0) - 64;
-    if (row > 0 && row < board.length-1 && col > 0 && col < board[0].length){ //No idea what this loop does - Tim
-      for (int i = row - 1; i < row + 2; i ++){
-        for (int j = col - 1; j < col + 2; j++){
-          if (board[row][col] > 0){
-            // HOW DO I ACCESS THE CURRENT PLAYER'S VIEW OF THE OTHER PLAYER'S BOARD?
+    for (int i = 0; i < board.length; i ++) {
+      for (int j = 0; j < board[i].length; j ++) {
+        if (board[i][j] >= 'A' && board[i][j] <= 'Z') { //print column indicators
+          System.out.print((char)(board[i][j]));
+        }
+        else {
+          if (board[i][j] == 1 && j > 0) { //print hits
+            System.out.print("X");
+          }
+          else if (board[i][j] == 2 && j > 0) { //print misses
+            System.out.print("O");
+          }
+          else {
+            if (j == 0) {
+              System.out.print(board[i][j]); //print row indicators
+              if (board[i][j] < 10 && j >= 10) { // spacing
+                System.out.print(" ");
+              }
+            }
+            else {
+              if (board[i][j] == 0 || !(i <= row + 1 && i >= row - 1 && j <= col + 1 && j >= col - 1)) {
+                System.out.print(" "); //print empties (concealed)
+              }
+              else if (board[i][j] == 3) {
+                System.out.print("T"); //prints traps
+              }
+              else {
+                System.out.print(board[i][j] * -1); //print ships (not concealed)
+              }
+            }
           }
         }
+        if (j < board[i].length - 1) {
+          System.out.print(", ");
+        }
       }
+      System.out.println("");
     }
   }
 

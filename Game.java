@@ -120,6 +120,7 @@ public class Game {
           if (input.equalsIgnoreCase("Y")) {
             System.out.println("Which power up?");
             System.out.println("(1) Nuke " + "(" + playerTwo.getNukes() + " remaining)");
+            System.out.println("(2) Sonar " + "(" + playerOne.getSonars() + " remaining)");
             try {
               powerUpSelector = in.nextInt();
               if (powerUpSelector == 1) {
@@ -128,6 +129,14 @@ public class Game {
                 }
                 else {
                   System.out.println("You do not have any more nukes.");
+                }
+              }
+              if (powerUpSelector == 2) {
+                if (playerTwo.getSonars() > 0) {
+                  powerUpChosen = true;
+                }
+                else {
+                  System.out.println("You do not have any more sonars.");
                 }
               }
             }
@@ -164,6 +173,12 @@ public class Game {
               printBoard(playerOneBoard, true);
             }
             playerTwo.useNuke();
+          }
+          if (powerUpSelector == 2) {
+            clearTerminal();
+            gotoTop();
+            System.out.println("Used a sonar on " + input + "!");
+            PowerUp.sonar(input, playerOneBoard);
           }
           powerUpChosen = false;
         }
@@ -210,6 +225,7 @@ public class Game {
           if (input.equalsIgnoreCase("Y")) {
             System.out.println("Which power up?");
             System.out.println("(1) Nuke " + "(" + playerOne.getNukes() + " remaining)");
+            System.out.println("(2) Sonar " + "(" + playerOne.getSonars() + " remaining)");
             try {
               powerUpSelector = in.nextInt();
               if (powerUpSelector == 1) {
@@ -218,6 +234,14 @@ public class Game {
                 }
                 else {
                   System.out.println("You do not have any more nukes.");
+                }
+              }
+              if (powerUpSelector == 2) {
+                if (playerTwo.getSonars() > 0) {
+                  powerUpChosen = true;
+                }
+                else {
+                  System.out.println("You do not have any more sonars.");
                 }
               }
             }
@@ -253,6 +277,12 @@ public class Game {
               printBoard(playerTwoBoard, true);
             }
             playerOne.useNuke();
+          }
+          if (powerUpSelector == 2) {
+            clearTerminal();
+            gotoTop();
+            System.out.println("Used a sonar on " + input + "!");
+            PowerUp.sonar(input, playerTwoBoard);
           }
           powerUpChosen = false;
         }
