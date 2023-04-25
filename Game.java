@@ -16,6 +16,11 @@ public class Game {
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
 
+
+  /*
+  GOALS
+  improve isValid cor code
+  */
   public static void main(String[] args) {
     int turn = 0;
     //To alternate between player turns
@@ -155,7 +160,7 @@ public class Game {
 
         //EVALUATING TILE
         if (powerUpChosen) {
-          if (powerUpSelector == 1) {
+          if (powerUpSelector == 1) {//Choosing nuke
             if (PowerUp.nuke(input, playerOneBoard, playerOneShips)) {//if true, then battleship is hit
               clearTerminal();
               gotoTop();
@@ -286,7 +291,7 @@ public class Game {
           }
           powerUpChosen = false;
         }
-        else {
+        else {//continue to regular shots
           int battleshipHit = playerTwoBoard[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
           if (PowerUp.missile(input, playerTwoBoard, playerTwoShips)) {//if true, then battleship is hit
             clearTerminal();
@@ -546,6 +551,7 @@ public class Game {
   private static boolean isValidCoordinate(String coord){ //params: s = input, r = rows, c = columns
     try {
       return (coord.length() >= 1 && coord.charAt(0) >= 'A' && coord.charAt(0) <= 'Z' && Integer.parseInt(coord.substring(1)) <= rows &&  Integer.parseInt(coord.substring(1)) >= 0);
+      //checks if coord length > 1 A!, not A, char 1 is between A to Z, check second index if its less than or equal to rows, and greater than 0
     }
     catch (Exception e) {
       return false;

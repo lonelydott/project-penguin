@@ -156,4 +156,97 @@ public class PowerUp{
       return true;
     }
   }
+
+  String Dragon = """
+                      ______________                               
+        ,===:'.,            `-._                           
+            `:.`---.__         `-._                       
+                `:.     `--.         `.                     
+                  \.        `.         `.                   
+          (,,(,    \.         `.   ____,-`.,                
+      (,'     `/   \.   ,--.___`.'                         
+  ,  ,'  ,--.  `,   \.;'         `                         
+    `{D, {    \  :    \;                                    
+      V,,'    /  /    //                                    
+      j;;    /  ,' ,-//.    ,---.      ,                    
+      \;'   /  ,' /  _  \  /  _  \   ,'/                    
+            \   `'  / \  `'  / \  `.' /                     
+            `.___,'   `.__,'   `.__,'
+      """;
+
+
+  String[] arr0 = new String[5];
+  arr0[0] = "     _    _";
+  arr0[1] = "  __|_|__|_|___";
+  arr0[2] = "|o o o o o o o o /  ";
+  arr0[3] = "~'`~'`~'`~'`~'`~'`~'`~";
+
+  String[] arr1 = new String[11];
+  String VikingShip = """
+                    ~.
+            Ya...___|__..aab     .   .
+              Y88a  Y88o  Y88a   (     )
+              Y88b  Y88b  Y88b   `.oo'
+              :888  :888  :888  ( (`-'
+      .---.    d88P  d88P  d88P   `.`.
+    / .-._)  d8P'"""|"""'-Y8P      `.`.
+    ( (`._) .-.  .-. |.-.  .-.  .-.   ) )
+    \ `---( O )( O )( O )( O )( O )-' /
+      `.    `-'  `-'  `-'  `-'  `-'  .' CJ
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      """;
+
+  String[] arr2 = new String[21];
+  String BlackPearl = """
+      --    .-""-.
+      ) (     )
+    (   )   (
+        /     )
+      (_    _)                     0_,-.__
+        (_  )_                     |_.-._/
+          (    )                    |_--..\
+          (__)                     |__--_/
+        |''   ``\                   |
+        |        \                  |      /b.
+        |         \  ,,,---===?A`\  |  ,==y'
+      ___,,,,,---==""\        |M] \ | ;|\ |>
+              _   _   \   ___,|H,,---==""""bno,
+      o  O  (_) (_)   \ /          _     AWAW/
+                        /         _(+)_  dMM/
+        \@_,,,,,,---=="   \      \\|//  MW/
+  --''''"                         ===  d/
+                                      //
+                                      ,'__________________________
+      \    \    \     \               ,/~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                            _____    ,'  ~~~   .-""-.~~~~~~  .-""-.
+        .-""-.           ///==---   /`-._ ..-'      -.__..-'
+              `-.__..-' =====\\\\\\ V/  .---\.
+    PGMG                 ~~~~~~~~~~~~, _',--/_.\  .-""-.
+                              .-""-.___` --  \|         -.__..-
+  
+  
+      """;
+  
+  
+  public static void PrintShips() {
+    int shipNum = RandomNumGen(3);
+    String ship = "arr" + shipNum;
+    //Thread.sleep(100);
+    //continue printing everything except waves, decreasing by one everytime(putting strings in array? or using Scanner?)
+    //part where I only print alternating waves. 
+    //limit of while loop
+    int count = 0;
+    for(int index = arr0.length - 2; index > 0; index--) {
+      System.out.println(ship[index]);
+      System.out.println(ship[ship.length - 1]); //wave
+      //sys out reflection of wave
+    }
+
+  }
+
+  public static int RandomNumGen(int n) {
+    Random Rand = new Random();
+    int randInt = Rand.nextInt(n);
+    return randInt;
+  }
 }
