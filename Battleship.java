@@ -1,5 +1,4 @@
-import java.util.Arrays;
-import java.util.ArrayList;
+
 public class Battleship {
   private int length;
   //coordinates of front of ship
@@ -57,55 +56,4 @@ public class Battleship {
   }
 
 
-
-  //FOR TESTING
-  public static void main(String[] args) {
-    ArrayList<Battleship> testList = new ArrayList<Battleship>();
-    for (int i = 1; i < 3; i ++) {
-      Battleship testShip = new Battleship("A" + i, "A" + (i + 1));
-      //System.out.println("A" + i + ", " + "A" + (i + 1));
-      testList.add(testShip);
-      System.out.println(testShip);
-    }
-    // Battleship testShip = new Battleship("A1", "A2");
-    // System.out.println(testShip.getFrontX());
-    // Battleship testShip1 = new Battleship("B2", "B3");
-    // System.out.println(testShip.getFrontX());
-    // System.out.println("A1".charAt(0) - 64);
-    //
-    //
-    // System.out.println(testShip);
-    // System.out.println(testShip1);
-    //
-    // ArrayList<Battleship> testList = new ArrayList<Battleship>();
-    // testList.add(testShip);
-    // System.out.println(testList);
-    // testList.add(testShip1);
-    System.out.println(testList);
-
-
-    /*
-    int[][] testBoard = new int[5][5];
-    for (int i = 0; i < 5; i ++) {
-      for (int j = 0; j < 5; j ++) {
-        testBoard[i][j] = 0;
-      }
-    }
-    for (int i = 0; i < 5; i ++) {
-      System.out.println(Arrays.toString(testBoard[i]));
-    }
-    testList.add(testShip);
-
-    //System.out.println("Front: " + testShip.getFrontX() + ", " + testShip.getFrontY());
-    //System.out.println("Back: " + testShip.getBackX() + ", " + testShip.getBackY());
-
-    for (int i = 0; i < testList.size(); i ++) {
-      testList.get(i).place(testBoard, (i + 1) * -1);
-    }
-
-    for (int i = 0; i < 5; i ++) {
-      System.out.println(Arrays.toString(testBoard[i]));
-    }
-    */
-  }
 }
