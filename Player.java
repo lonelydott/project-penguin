@@ -1,14 +1,15 @@
 import java.util.ArrayList;
 public class Player {
-  private static int[][] playerBoard;
-  private static ArrayList<Battleship> playerShips;
-  private static int playerShipsLeft;
-  private static boolean isCPU;
-  private static double probabilityPowerUp = .05;
-  private static PowerUp playerPowerUp;
+  private int[][] playerBoard;
+  private ArrayList<Battleship> playerShips;
+  private int playerShipsLeft;
+  private boolean isCPU;
+  private double probabilityPowerUp = .05;
+  private PowerUp playerPowerUp;
+  private int ID;
   //increase probability of choosing power ups when there are less available tiles
 
-  public Player(int rows, int cols, int ships, boolean powerUps, boolean consideredCPU) {
+  public Player(int rows, int cols, int ships, boolean powerUps, boolean consideredCPU, int num) {
     playerBoard = createBoard(rows, cols);
     playerShips = new ArrayList<Battleship>(ships);
     playerShipsLeft = ships;
@@ -19,6 +20,7 @@ public class Player {
     else {
       playerPowerUp = null;
     }
+    ID = num;
   }
   public int[][] getBoard() {
     return playerBoard;
@@ -28,6 +30,9 @@ public class Player {
   }
   public int getShipsLeft() {
     return playerShipsLeft;
+  }
+  public void decreaseShipsLeft() {
+    playerShipsLeft --;
   }
   public PowerUp getPowerUp() {
     return playerPowerUp;
@@ -42,6 +47,9 @@ public class Player {
   }
   public void choosePowerUp() {
 
+  }
+  public String toString() {
+    return "PLAYER " + ID;
   }
 
 
