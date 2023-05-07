@@ -1,5 +1,7 @@
 import java.util.*;
+import java.util.ArrayList;
 public class Game {
+  private static ArrayList<Player> playerList;
   private static int[][] playerOneBoard;
   private static ArrayList<Battleship> playerOneShips;
   private static int playerOneShipsLeft;
@@ -33,11 +35,12 @@ public class Game {
     //INITIAL GAME SETUP
     clearTerminal();
     gotoTop();
-    if (args.length == 4) {
+    if (args.length == 5) {
       rows = Integer.parseInt(args[0]);
       columns = Integer.parseInt(args[1]);
       numberShips = Integer.parseInt(args[2]);
       powerUpEnabled = (args[3].equals("Y"));
+      playerList = new ArrayList<Player>(Integer.parseInt(args[5]));
     }
     else {
       System.out.println("How many rows?"); //ROWS
@@ -71,6 +74,14 @@ public class Game {
         input = in.next();
       }
       powerUpEnabled = (input.equals("Y"));
+
+      System.out.println("How many players?"); //ROWS
+      String inputPlayers = in.next();
+      while(!isValid(inputPlayers, 2, -1)) {
+        System.out.println("Please enter a valid amount of players!");
+        inputRows = in.next();
+      }
+      playerList = new ArrayList<Player>(Integer.parseInt(inputPlayers));
     }
 
     PowerUp playerOne = new PowerUp();
@@ -346,6 +357,9 @@ public class Game {
       return true;
     }
     else{
+      if (y >= low && high == -1) {
+        return true;
+      }
       return false;
     }
   }
