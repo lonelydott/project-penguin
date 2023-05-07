@@ -2,6 +2,7 @@ import java.util.*;
 import java.util.ArrayList;
 public class Game {
   private static ArrayList<Player> playerList;
+  private static String numberPlayers;
   private static int[][] playerOneBoard;
   private static ArrayList<Battleship> playerOneShips;
   private static int playerOneShipsLeft;
@@ -11,6 +12,7 @@ public class Game {
   private static int rows = 0;
   private static int columns = 0;
   private static boolean powerUpEnabled;
+  private static boolean containsCPU;
   private static boolean powerUpChosen;
   //private static ArrayList<String> spotsTaken;
   private static int numberShips = 0;
@@ -76,12 +78,28 @@ public class Game {
       powerUpEnabled = (input.equals("Y"));
 
       System.out.println("How many players?"); //ROWS
-      String inputPlayers = in.next();
-      while(!isValid(inputPlayers, 2, -1)) {
+      numberPlayers = in.next();
+      while(!isValid(numberPlayers, 2, -1)) {
         System.out.println("Please enter a valid amount of players!");
         inputRows = in.next();
       }
-      playerList = new ArrayList<Player>(Integer.parseInt(inputPlayers));
+      playerList = new ArrayList<Player>(Integer.parseInt(numberPlayers));
+
+      System.out.println("Add a CPU player? (Y/N)");
+      input = in.next();
+      while(!((input.equals("Y")) || input.equals("N"))) {
+        System.out.println("Please enter Y/N!");
+        input = in.next();
+      }
+      containsCPU = (input.equals("Y"));
+    }
+
+    for (int i = 0; i < Integer.parseInt(numberPlayers); i ++) {
+      clearTerminal();
+      gotoTop();
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true));
+      System.out.println("PLAYER " + (i + 1) + ": CREATE YOUR SHIPS");
+      place(playerList.get(i));
     }
 
     PowerUp playerOne = new PowerUp();
@@ -100,19 +118,14 @@ public class Game {
     playerOneShips = new ArrayList<Battleship>(numberShips);
     playerTwoShips = new ArrayList<Battleship>(numberShips);
 
-    //PLACING SHIPS
-    clearTerminal();
-    gotoTop();
 
-
-
-    System.out.println("PLAYER ONE: CREATE YOUR SHIPS"); //PLAYER ONE
-    place(playerOneBoard, playerOneShips, playerOne);
-
-    //NOTE: Player two setup is very similar, if not identical, to player one setup. Therefore, issues with player 1 are consistent with issues with player 2.
-    //NOTE: Due to similarities between each player, transforming this into a function could be possible (3+ players?) (potential custom gamemode?) (allow players to choose who to attack?)
-    System.out.println("PLAYER TWO: CREATE YOUR SHIPS"); //PLAYER TWO
-    place(playerTwoBoard, playerTwoShips, playerTwo);
+    // System.out.println("PLAYER ONE: CREATE YOUR SHIPS"); //PLAYER ONE
+    // place(playerOneBoard, playerOneShips, playerOne);
+    //
+    // //NOTE: Player two setup is very similar, if not identical, to player one setup. Therefore, issues with player 1 are consistent with issues with player 2.
+    // //NOTE: Due to similarities between each player, transforming this into a function could be possible (3+ players?) (potential custom gamemode?) (allow players to choose who to attack?)
+    // System.out.println("PLAYER TWO: CREATE YOUR SHIPS"); //PLAYER TWO
+    // place(playerTwoBoard, playerTwoShips, playerTwo);
 
     //BOMBING PHASE (AFTER PLACING SHIPS)
     while(playerOneShipsLeft > 0 && playerTwoShipsLeft > 0){ //GAME CONTINUES AS LONG AS ALL PLAYERS HAVE SHIPS LEFT ON THEIR BOARD
@@ -363,11 +376,11 @@ public class Game {
       return false;
     }
   }
-  public static void place(int[][] board, ArrayList<Battleship> shipList, PowerUp player) {
+  public static void place(Player player) {
     Scanner in = new Scanner(System.in);
     String front = "";
     String back = "";
-    printBoard(board, false);
+    printBoard(player.getBoard(), false);
     for (int i = 0; i < numberShips; i ++) {
       //SET UP COORDINATES
       System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
@@ -380,7 +393,7 @@ public class Game {
 
       System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
       back = in.next();
-      while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, shipList)) {
+      while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, player.getShipList())) {
         if (back.equals("cancel")) {
           System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
           front = in.next();
@@ -400,16 +413,16 @@ public class Game {
       }
 
       //FINISHING GAME SETUP: finishing board layout with ships and populating arraylist
-      shipList.add(new Battleship(front, back)); //arraylist
-      shipList.get(i).place(board, (i + 1) * -1); //placing ships on board... this place is a place method from another class
+      player.getShipList().add(new Battleship(front, back)); //arraylist
+      player.getShipList().get(i).place(player.getBoard(), (i + 1) * -1); //placing ships on board... this place is a place method from another class
 //      System.out.println(Arrays.toString(playerOneBoard));
       clearTerminal();
       gotoTop();
-      printBoard(board, false);
+      printBoard(player.getBoard(), false);
     }
 
     if (powerUpEnabled) {
-      for (int i = 0; i < player.getTraps(); i ++) {
+      for (int i = 0; i < player.getPowerUp().getTraps(); i ++) {
         System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
         front = in.next();
         while (!isValidCoordinate(front)) {
@@ -420,7 +433,7 @@ public class Game {
 
         System.out.println("Back of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
         back = in.next();
-        while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, shipList)) {
+        while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, player.getShipList())) {
           if (back.equals("cancel")) {
             System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
             front = in.next();
@@ -439,18 +452,18 @@ public class Game {
           back = swap;
         }
         Battleship trap = new Battleship(front, back);
-        trap.place(board, 3);
+        trap.place(player.getBoard(), 3);
 
         clearTerminal();
         gotoTop();
-        printBoard(board, false);
+        printBoard(player.getBoard(), false);
       }
     }
 
     //GAME SET UP: Announcing final board to player 1
     System.out.println("YOUR FINAL BOARD");
-    for (int i = 0; i < shipList.size(); i ++) { //coordinates of every ship
-      System.out.println("(Battleship " + (i + 1) + ") " + shipList.get(i));
+    for (int i = 0; i < player.getShipList().size(); i ++) { //coordinates of every ship
+      System.out.println("(Battleship " + (i + 1) + ") " + player.getShipList().get(i));
     }
     System.out.println("PRESS ENTER TO CONTINUE");
     in.nextLine();
