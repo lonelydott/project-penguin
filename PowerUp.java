@@ -157,20 +157,20 @@ public class PowerUp{
     }
   }
 
-  String Dragon = """
-                      ______________                               
-        ,===:'.,            `-._                           
-            `:.`---.__         `-._                       
-                `:.     `--.         `.                     
-                  \.        `.         `.                   
-          (,,(,    \.         `.   ____,-`.,                
-      (,'     `/   \.   ,--.___`.'                         
-  ,  ,'  ,--.  `,   \.;'         `                         
-    `{D, {    \  :    \;                                    
-      V,,'    /  /    //                                    
-      j;;    /  ,' ,-//.    ,---.      ,                    
-      \;'   /  ,' /  _  \  /  _  \   ,'/                    
-            \   `'  / \  `'  / \  `.' /                     
+/*  String Dragon = """
+                      ______________
+        ,===:'.,            `-._
+            `:.`---.__         `-._
+                `:.     `--.         `.
+                  \.        `.         `.
+          (,,(,    \.         `.   ____,-`.,
+      (,'     `/   \.   ,--.___`.'
+  ,  ,'  ,--.  `,   \.;'         `
+    `{D, {    \  :    \;
+      V,,'    /  /    //
+      j;;    /  ,' ,-//.    ,---.      ,
+      \;'   /  ,' /  _  \  /  _  \   ,'/
+            \   `'  / \  `'  / \  `.' /
             `.___,'   `.__,'   `.__,'
       """;
 
@@ -223,24 +223,24 @@ public class PowerUp{
               `-.__..-' =====\\\\\\ V/  .---\.
     PGMG                 ~~~~~~~~~~~~, _',--/_.\  .-""-.
                               .-""-.___` --  \|         -.__..-
-  
-  
-      """;
-  
-  
+
+
+      """; */
+
+
   public static void PrintShips() {
     int shipNum = RandomNumGen(3);
     String ship = "arr" + shipNum;
     //Thread.sleep(100);
     //continue printing everything except waves, decreasing by one everytime(putting strings in array? or using Scanner?)
-    //part where I only print alternating waves. 
+    //part where I only print alternating waves.
     //limit of while loop
     int count = 0;
-    for(int index = arr0.length - 2; index > 0; index--) {
+/*    for(int index = arr0.length - 2; index > 0; index--) {
       System.out.println(ship[index]);
       System.out.println(ship[ship.length - 1]); //wave
       //sys out reflection of wave
-    }
+    } */
 
   }
 

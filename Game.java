@@ -75,19 +75,22 @@ public class Game {
 
       System.out.println("How many players?"); //ROWS
       numberPlayers = in.next();
-      while(!isValid(numberPlayers, 2, -1)) {
+      while(!isValid(numberPlayers, 1, -1)) {
         System.out.println("Please enter a valid amount of players!");
         inputRows = in.next();
+        numberPlayers = inputRows;
       }
       playerList = new ArrayList<Player>(Integer.parseInt(numberPlayers));
 
-      System.out.println("Add a CPU player? (Y/N)");
-      input = in.next();
-      while(!((input.equals("Y")) || input.equals("N"))) {
-        System.out.println("Please enter Y/N!");
+      if (numberPlayers.equals("1")){
+        System.out.println("Add a CPU player? (Y/N)");
         input = in.next();
+        while(!((input.equals("Y")) || input.equals("N"))) {
+          System.out.println("Please enter Y/N!");
+          input = in.next();
+        }
+        containsCPU = (input.equals("Y"));
       }
-      containsCPU = (input.equals("Y"));
     }
 
     for (int i = 0; i < Integer.parseInt(numberPlayers); i ++) {
