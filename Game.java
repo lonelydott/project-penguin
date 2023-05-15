@@ -209,6 +209,7 @@ public class Game {
           }
         }
         System.out.println("Please choose a valid coordinate for length " + (i+2));
+
         back = in.next();
       }
 
@@ -217,9 +218,9 @@ public class Game {
         front = back;
         back = swap;
       }
-
       //FINISHING GAME SETUP: finishing board layout with ships and populating arraylist
       player.getShipList().add(new Battleship(front, back)); //arraylist
+
       player.getShipList().get(i).place(player.getBoard(), (i + 1) * -1); //placing ships on board... this place is a place method from another class
 //      System.out.println(Arrays.toString(playerOneBoard));
       clearTerminal();
@@ -530,12 +531,14 @@ public class Game {
     for (int index = 0; index < list.size(); index ++) {
       if (vertical) {
         if (front.charAt(0) - 64 <= list.get(index).getBackX() && front.charAt(0) - 64 >= list.get(index).getFrontX()) {
-          return true;
+          if (Integer.parseInt(front.substring(1)) <= list.get(index).getFrontY() && Integer.parseInt(back.substring(1)) >= list.get(index).getBackY()) {
+            return true;
+          }
         }
       }
       else {
-        if (Integer.parseInt(front.substring(1)) <= list.get(index).getBackY() && Integer.parseInt(front.substring(1)) >= list.get(index).getFrontY()) {
-          if (front.charAt(0) - 64 <= list.get(index).getBackX() && front.charAt(0) - 64 >= list.get(index).getFrontX()) {
+        if (Integer.parseInt(front.substring(1)) >= list.get(index).getFrontY() && Integer.parseInt(front.substring(1)) <= list.get(index).getBackY()) {
+          if (front.charAt(0) - 64 <= list.get(index).getBackX() && back.charAt(0) - 64 >= list.get(index).getFrontX()) {
             return true;
           }
         }
