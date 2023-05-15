@@ -6,7 +6,7 @@ public class Game {
   private static int rows = 0;
   private static int columns = 0;
   private static boolean powerUpEnabled;
-  private static boolean containsCPU;
+  private static boolean containsCPU = false;
   private static boolean powerUpChosen;
   //private static ArrayList<String> spotsTaken;
   private static int numberShips = 0;
@@ -91,14 +91,21 @@ public class Game {
         }
         containsCPU = (input.equals("Y"));
       }
+
+      if (containsCPU) {
+        playerList = new ArrayList<Player>(Integer.parseInt(numberPlayers) + 1);
+      }
     }
 
-    for (int i = 0; i < Integer.parseInt(numberPlayers); i ++) {
+    for (int i = 1; i < Integer.parseInt(numberPlayers) + 1; i ++) {
       clearTerminal();
       gotoTop();
-      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, false, i + 1));
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, false, "Player " + i));
       System.out.println(playerList.get(i) + ": CREATE YOUR SHIPS");
       place(playerList.get(i));
+    }
+    if (containsCPU) {
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player " + (Integer.parseInt(numberPlayers) + 1) + "(CPU)"));
     }
 
 
@@ -127,18 +134,29 @@ public class Game {
         clearTerminal();
         gotoTop();
         if (playerList.size() > 2) {
-          System.out.println("<" + playerList.get(i) + "'S TURN>");
-          System.out.println("Who do you want to attack?");
-          input = in.next();
-          while(!isValid(input, 1, playerList.size()) || Integer.parseInt(input) == i + 1) {
-            System.out.println("Please enter a valid player! (1-" + playerList.size() + ")");
+          if (playerList.get(i).robotCheck()) {
+            int playerChosen = Math.random() * playerList.size();
+            if (attack(playerList.get(i), playerList.get(playerChosen))) {
+              playerList.remove(playerChosen);
+            }
+            clearTerminal();
+            gotoTop();
+          }
+          else {
+            System.out.println("<" + playerList.get(i) + "'S TURN>");
+            System.out.println("Who do you want to attack?");
             input = in.next();
+            while(!isValid(input, 1, playerList.size()) || Integer.parseInt(input) == i + 1) {
+              System.out.println("Please enter a valid player! (1-" + playerList.size() + ")");
+              input = in.next();
+            }
+            if (attack(playerList.get(i), playerList.get(Integer.parseInt(input) - 1))) {
+              playerList.remove(Integer.parseInt(input) - 1);
+            }
+            clearTerminal();
+            gotoTop();
           }
-          if (attack(playerList.get(i), playerList.get(Integer.parseInt(input) - 1))) {
-            playerList.remove(Integer.parseInt(input) - 1);
-          }
-          clearTerminal();
-          gotoTop();
+
         }
         else {
           if (i == 0) {
@@ -290,57 +308,150 @@ public class Game {
     System.out.println("<" + playerTarget + "'S BOARD>");
 
     //PROMPT TO CHOOSE TILE
-    if (powerUpEnabled) {
-      System.out.println("Would you like to use a power up?  (Y/N)");
-      input = in.next();
-      while (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")){
-        System.out.println("Would you like to use a power up?  (Y/N)");
-        input = in.next();
-      }
-      if (input.equalsIgnoreCase("Y")) {
-        System.out.println("Which power up?");
-        System.out.println("(1) Nuke " + "(" + playerAttacking.getPowerUp().getNukes() + " remaining)");
-        System.out.println("(2) Sonar " + "(" + playerAttacking.getPowerUp().getSonars() + " remaining)");
-        try {
-          powerUpSelector = in.nextInt();
-          if (powerUpSelector == 1) {
-            if (playerAttacking.getPowerUp().getNukes() > 0) {
-              powerUpChosen = true;
+    if (playerAttacking.robotCheck()) {
+      if (Math.random() < playerAttacking.getPowerUpProbability()) {
+        powerUpSelector = (int)(Math.random() * 3);
+        if (powerUpSelector == 1) {
+          if (playerAttacking.getPowerUp().getNukes() > 0) {
+            powerUpChosen = true;
+          }
+        }
+        if (powerUpSelector == 2) {
+          if (playerAttacking.getPowerUp().getSonars() > 0) {
+            powerUpChosen = true;
+          }
+        }
+        String tile = playerAttacking.chooseRandomTile(rows, columns);
+
+        if (powerUpChosen) {
+          if (powerUpSelector == 1) {//Choosing nuke
+            if (PowerUp.nuke(tile, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
+              clearTerminal();
+              gotoTop();
+              System.out.println("CPU hit a ship!");
+              printBoard(playerTarget.getBoard(), true);
             }
-            else {
-              System.out.println("You do not have any more nukes.");
+            else { //missed
+              clearTerminal();
+              gotoTop();
+              System.out.println("CPU missed!");
+              printBoard(playerTarget.getBoard(), true);
             }
+            playerAttacking.getPowerUp().useNuke();
           }
           if (powerUpSelector == 2) {
-            if (playerAttacking.getPowerUp().getSonars() > 0) {
-              powerUpChosen = true;
-            }
-            else {
-              System.out.println("You do not have any more sonars.");
-            }
+            clearTerminal();
+            gotoTop();
+            System.out.println("Used a sonar on " + tile + "!");
+            PowerUp.sonar(tile, playerTarget.getBoard());
           }
-        }
-        catch (Exception e) {
-          input = in.next();
           powerUpChosen = false;
         }
+        else {
+          int battleshipHit = playerTarget.getBoard()[Integer.parseInt(tile.substring(1, tile.length()))][tile.charAt(0) - 64] * -1 - 1;
+          if (PowerUp.missile(tile, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
+            clearTerminal();
+            gotoTop();
+            System.out.println("CPU hit a ship!");
+            printBoard(playerTarget.getBoard(), true);
+
+            //NOTE: the attack() method automatically changes internal length of battleship
+            if (battleshipHit != -4 && playerTarget.getShipList().get(battleshipHit).getLength() == 0) { //checking for last hit
+              playerTarget.decreaseShipsLeft(); //last hit = subtract amount of remaining ships (lose condition)
+            }
+          }
+          else { //missed
+            clearTerminal();
+            gotoTop();
+            System.out.println("CPU missed!");
+            printBoard(playerTarget.getBoard(), true);
+          }
+
+        }
+
       }
     }
-    System.out.println("Please choose coordinates (EX: A1)");
-    input = in.next();
-    while (!isValidCoordinate(input)) {
-      System.out.println("Please choose valid coordinates");
+    else {
+      if (powerUpEnabled) {
+        System.out.println("Would you like to use a power up?  (Y/N)");
+        input = in.next();
+        while (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")){
+          System.out.println("Would you like to use a power up?  (Y/N)");
+          input = in.next();
+        }
+        if (input.equalsIgnoreCase("Y")) {
+          System.out.println("Which power up?");
+          System.out.println("(1) Nuke " + "(" + playerAttacking.getPowerUp().getNukes() + " remaining)");
+          System.out.println("(2) Sonar " + "(" + playerAttacking.getPowerUp().getSonars() + " remaining)");
+          try {
+            powerUpSelector = in.nextInt();
+            if (powerUpSelector == 1) {
+              if (playerAttacking.getPowerUp().getNukes() > 0) {
+                powerUpChosen = true;
+              }
+              else {
+                System.out.println("You do not have any more nukes.");
+              }
+            }
+            if (powerUpSelector == 2) {
+              if (playerAttacking.getPowerUp().getSonars() > 0) {
+                powerUpChosen = true;
+              }
+              else {
+                System.out.println("You do not have any more sonars.");
+              }
+            }
+          }
+          catch (Exception e) {
+            input = in.next();
+            powerUpChosen = false;
+          }
+        }
+      }
+      System.out.println("Please choose coordinates (EX: A1)");
       input = in.next();
-    }
+      while (!isValidCoordinate(input)) {
+        System.out.println("Please choose valid coordinates");
+        input = in.next();
+      }
 
-    //EVALUATING TILE
-    if (powerUpChosen) {
-      if (powerUpSelector == 1) {//Choosing nuke
-        if (PowerUp.nuke(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
+      //EVALUATING TILE
+      if (powerUpChosen) {
+        if (powerUpSelector == 1) {//Choosing nuke
+          if (PowerUp.nuke(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
+            clearTerminal();
+            gotoTop();
+            System.out.println("You hit a ship!");
+            printBoard(playerTarget.getBoard(), true);
+          }
+          else { //missed
+            clearTerminal();
+            gotoTop();
+            System.out.println("You missed!");
+            printBoard(playerTarget.getBoard(), true);
+          }
+          playerAttacking.getPowerUp().useNuke();
+        }
+        if (powerUpSelector == 2) {
+          clearTerminal();
+          gotoTop();
+          System.out.println("Used a sonar on " + input + "!");
+          PowerUp.sonar(input, playerTarget.getBoard());
+        }
+        powerUpChosen = false;
+      }
+      else {
+        int battleshipHit = playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
+        if (PowerUp.missile(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
           clearTerminal();
           gotoTop();
           System.out.println("You hit a ship!");
           printBoard(playerTarget.getBoard(), true);
+
+          //NOTE: the attack() method automatically changes internal length of battleship
+          if (battleshipHit != -4 && playerTarget.getShipList().get(battleshipHit).getLength() == 0) { //checking for last hit
+            playerTarget.decreaseShipsLeft(); //last hit = subtract amount of remaining ships (lose condition)
+          }
         }
         else { //missed
           clearTerminal();
@@ -348,36 +459,7 @@ public class Game {
           System.out.println("You missed!");
           printBoard(playerTarget.getBoard(), true);
         }
-        playerAttacking.getPowerUp().useNuke();
       }
-      if (powerUpSelector == 2) {
-        clearTerminal();
-        gotoTop();
-        System.out.println("Used a sonar on " + input + "!");
-        PowerUp.sonar(input, playerTarget.getBoard());
-      }
-      powerUpChosen = false;
-    }
-    else {
-      int battleshipHit = playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
-      if (PowerUp.missile(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
-        clearTerminal();
-        gotoTop();
-        System.out.println("You hit a ship!");
-        printBoard(playerTarget.getBoard(), true);
-
-        //NOTE: the attack() method automatically changes internal length of battleship
-        if (battleshipHit != -4 && playerTarget.getShipList().get(battleshipHit).getLength() == 0) { //checking for last hit
-          playerTarget.decreaseShipsLeft(); //last hit = subtract amount of remaining ships (lose condition)
-        }
-      }
-      else { //missed
-        clearTerminal();
-        gotoTop();
-        System.out.println("You missed!");
-        printBoard(playerTarget.getBoard(), true);
-      }
-
     }
 
     //Game pause, allow players to see turn result

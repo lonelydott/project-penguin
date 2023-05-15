@@ -6,10 +6,10 @@ public class Player {
   private boolean isCPU;
   private double probabilityPowerUp = .05;
   private PowerUp playerPowerUp;
-  private int ID;
+  private String name;
   //increase probability of choosing power ups when there are less available tiles
 
-  public Player(int rows, int cols, int ships, boolean powerUps, boolean consideredCPU, int num) {
+  public Player(int rows, int cols, int ships, boolean powerUps, boolean consideredCPU, int id) {
     playerBoard = createBoard(rows, cols);
     playerShips = new ArrayList<Battleship>(ships);
     playerShipsLeft = ships;
@@ -20,7 +20,7 @@ public class Player {
     else {
       playerPowerUp = null;
     }
-    ID = num;
+    name = id;
   }
   public int[][] getBoard() {
     return playerBoard;
@@ -37,21 +37,32 @@ public class Player {
   public PowerUp getPowerUp() {
     return playerPowerUp;
   }
+  public String toString() {
+    return ID;
+  }
+
 
   //for future CPU classes
   public void placeRandom() {
 
   }
-  public void chooseRandomTile() {
-
+  public String chooseRandomTile(int r, int c) {
+    char X = (char)('A' + (int)(Math.random() * c));
+    int Y = (int)(Math.random() * r);
+    return "" + X + Y;
   }
   public void choosePowerUp() {
 
   }
-  public String toString() {
-    return "PLAYER " + ID;
+  public void changeProbabilityPowerUp(double input) {
+    probabilityPowerUp += input;
   }
-
+  public double getPowerUpProbability() {
+    return probabilityPowerUp;
+  }
+  public boolean robotCheck() {
+    return isCPU();
+  }
 
   public static int[][] createBoard(int row, int col) {//row, col = dimensions of board
     int[][] board = new int[row + 1][col + 1];
