@@ -156,8 +156,8 @@ public class PowerUp{
       return true;
     }
   }
-
-/*  String Dragon = """
+/*
+  String Dragon = """
                       ______________
         ,===:'.,            `-._
             `:.`---.__         `-._
@@ -225,7 +225,7 @@ public class PowerUp{
                               .-""-.___` --  \|         -.__..-
 
 
-      """; */
+      """;
 
 
   public static void PrintShips() {
@@ -236,11 +236,11 @@ public class PowerUp{
     //part where I only print alternating waves.
     //limit of while loop
     int count = 0;
-/*    for(int index = arr0.length - 2; index > 0; index--) {
+    for(int index = arr0.length - 2; index > 0; index--) {
       System.out.println(ship[index]);
       System.out.println(ship[ship.length - 1]); //wave
       //sys out reflection of wave
-    } */
+    }
 
   }
 
@@ -249,4 +249,5 @@ public class PowerUp{
     int randInt = Rand.nextInt(n);
     return randInt;
   }
+  */
 }
