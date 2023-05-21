@@ -82,7 +82,7 @@ public class Game {
       }
       playerList = new ArrayList<Player>(Integer.parseInt(numberPlayers));
 
-      if (numberPlayers.equals("1")){
+      if (!numberPlayers.equals("1")){
         System.out.println("Add a CPU player? (Y/N)");
         input = in.next();
         while(!((input.equals("Y")) || input.equals("N"))) {
@@ -90,6 +90,9 @@ public class Game {
           input = in.next();
         }
         containsCPU = (input.equals("Y"));
+      }
+      else {
+        containsCPU = true;
       }
 
       if (containsCPU) {
@@ -137,6 +140,9 @@ public class Game {
         if (playerList.size() > 2) {
           if (playerList.get(i).robotCheck()) {
             int playerChosen = (int)(Math.random() * playerList.size());
+            while (playerChosen != i) {
+              playerChosen = (int)(Math.random() * playerList.size());
+            }
             if (attack(playerList.get(i), playerList.get(playerChosen))) {
               playerList.remove(playerChosen);
             }
@@ -323,12 +329,12 @@ public class Game {
       String tile = playerAttacking.chooseRandomTile(rows, columns);
       System.out.println(playerAttacking + " is thinking...");
       try {
-        Thread.sleep(3000 + (int)(Math.random() * 4000));
+        Thread.sleep(2000 + (int)(Math.random() * 4000));
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
 
-      if (Math.random() < playerAttacking.getPowerUpProbability()) {
+      if (Math.random() < playerAttacking.getPowerUpProbability() && powerUpEnabled) {
         powerUpSelector = (int)(Math.random() * 3);
         if (powerUpSelector == 1) {
           if (playerAttacking.getPowerUp().getNukes() > 0) {
