@@ -12,12 +12,21 @@ public class Draw {
         while(text.hasNextLine()) {
             System.out.println(text.nextLine());
             count++;
-            if (count % size == 0) {
-                //System.out.print("\033[H\033[2J");  
-                System.out.flush();  
-                Thread.sleep(200);
+            if (count % (size) == 0) {
+                Thread.sleep(150);
+                clear();
+                Thread.sleep(15);
+                // System.out.print("\033[H\033[2J");  
+                
+                // System.out.flush();  
             }
         }
+    }
+
+    public static void clear() throws Exception{
+        Thread.sleep(80);
+        System.out.print("\u001b[2J");
+        Thread.sleep(10);
     }
 }
 
