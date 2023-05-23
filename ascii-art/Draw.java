@@ -7,7 +7,7 @@ public class Draw {
     }
     public static void PrintShips(int size) throws Exception{
         int count = 0;
-        File ascii = new File("Ascii.txt");
+        File ascii = new File("ascii-art/Ascii.txt");
         Scanner text = new Scanner(ascii);
         while(text.hasNextLine()) {
             System.out.println(text.nextLine());
