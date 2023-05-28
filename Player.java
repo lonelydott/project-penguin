@@ -1,19 +1,43 @@
-import java.util.ArrayList;
+import java.util.*;
 public class Player {
   private int[][] playerBoard;
   private ArrayList<Battleship> playerShips;
   private int playerShipsLeft;
   private boolean isCPU;
-  private double probabilityPowerUp = 1;
+  private int probabilityPowerUp = 1;
   private PowerUp playerPowerUp;
   private String name;
+  private int[][] heatMap;
+  private static final int MISSED = -1;
+  private static final int SUNK = -2;
+
   //increase probability of choosing power ups when there are less available tiles
+
+  public boolean recursion(int r, int c, int length) {
+    if (heatMap[r][c] == MISSED || r + length >= heatMap.length || c + length >= heatMap[r].length - length) {
+      return false;
+    }
+    else {
+      if (recursion(r + 1, c, length)) {
+        heatMap[r][c] ++;
+      }
+      if (recursion(r, c + 1, length)) {
+        heatMap[r][c] ++;
+      }
+      return true;
+    }
+  }
 
   public Player(int rows, int cols, int ships, boolean powerUps, boolean consideredCPU, String id) {
     playerBoard = createBoard(rows, cols);
     playerShips = new ArrayList<Battleship>(ships);
     playerShipsLeft = ships;
     isCPU = consideredCPU;
+
+    heatMap = new int[playerBoard.length][playerBoard[0].length];
+    updateHeatMap();
+
+
     if (powerUps) {
       playerPowerUp = new PowerUp();
     }
@@ -43,8 +67,103 @@ public class Player {
 
 
   //for future CPU classes
-  public void placeRandom() {
+  public int[][] getHeatMap() {
+    return heatMap;
+  }
+  public String chooseSmartTile(int[][] heatMapReference) {
+    int max = 0;
+    char X = 'A';
+    String Y = "1";
 
+    updateHeatMap();
+    for (int i = 1; i < heatMapReference.length; i ++) {
+      for (int j = 1; j < heatMapReference[i].length; j ++) {
+        if (heatMapReference[i][j] == SUNK) {
+
+          //ATTEMPT TO MAKE CPU CONTINUE GUESSING IN A LINE
+          // if (heatMap[i - 1][j] == SUNK && heatMap[i + 1][j] > 0) {
+          //   return "" + (char)(j + 64) + (i + 1);
+          // }
+          // if (heatMap[i + 1][j] == SUNK && heatMap[i - 1][j] > 0) {
+          //   return "" + (char)(j + 64) + (i - 1);
+          // }
+          // if (heatMap[i][j - 1] == SUNK && heatMap[i][j + 1] > 0) {
+          //   return "" + (char)(j + 65) + i;
+          // }
+          // if (heatMap[i][j + 1] == SUNK && heatMap[i][j - 1] > 0) {
+          //   return "" + (char)(j + 63) + i;
+          // }
+
+          if (i + 1 < heatMapReference.length && heatMapReference[i + 1][j] > 0) {
+            return "" + (char)(j + 64) + (i + 1);
+          }
+          if (heatMapReference[i - 1][j] > 0) {
+            return "" + (char)(j + 64) + (i - 1);
+          }
+          if (j + 1 < heatMapReference[i].length && heatMapReference[i][j + 1] > 0) {
+            return "" + (char)(j + 65) + i;
+          }
+          if (heatMapReference[i][j - 1] > 0) {
+            return "" + (char)(j + 63) + i;
+          }
+        }
+
+        if (heatMapReference[i][j] > max) {
+          max = heatMapReference[i][j];
+          X = (char)(j + 64);
+          Y = "" + i;
+        }
+      }
+    }
+    return X + Y;
+  }
+  public void updateHeatMap() {
+    heatMap = new int[playerBoard.length][playerBoard[0].length];
+    for (int i = 1; i < heatMap.length; i ++) {
+      for (int j = 1; j < heatMap[i].length; j ++) {
+        if (playerBoard[i][j] == Game.MISS) {
+          heatMap[i][j] = MISSED;
+        }
+        if (playerBoard[i][j] == Game.HIT) {
+          heatMap[i][j] = SUNK;
+        }
+
+        for (int k = 0; k < playerShipsLeft; k ++) {
+          for (int shipLength = 0; shipLength < k + 2; shipLength ++) {
+
+
+            if (i + shipLength < heatMap.length - shipLength) {
+              if (heatMap[i + shipLength][j] >= 0) {
+                heatMap[i + shipLength][j] ++;
+              }
+            }
+            if (j + shipLength < heatMap[i].length - shipLength) {
+              if (heatMap[i][j + shipLength] >= 0) {
+                heatMap[i][j + shipLength] ++;
+              }
+            }
+
+            if (heatMap[i][j] == MISSED) {
+              if (i + shipLength < heatMap.length && heatMap[i + shipLength][j] > 0) {
+                heatMap[i + shipLength][j] --;
+              }
+              if (i - shipLength > 0 && heatMap[i - shipLength][j] > 0) {
+                heatMap[i - shipLength][j] --;
+              }
+              if (j + shipLength < heatMap[i].length && heatMap[i][j + shipLength] > 0) {
+                heatMap[i][j + shipLength] --;
+              }
+              if (j - shipLength > 0 && heatMap[i][j - shipLength] > 0) {
+                heatMap[i][j - shipLength] --;
+              }
+            }
+
+
+          }
+        }
+
+      }
+    }
   }
   public String chooseRandomTile(int r, int c) {
     char X = (char)('A' + (int)(Math.random() * c));
@@ -79,4 +198,5 @@ public class Player {
     }
     return board; //board finished
   }
+
 }

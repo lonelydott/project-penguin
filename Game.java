@@ -330,10 +330,11 @@ public class Game {
 
     //PROMPT TO CHOOSE TILE
     if (playerAttacking.robotCheck()) {
-      input = playerAttacking.chooseRandomTile(rows, columns);
-      while (playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == HIT || playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == MISS) {
-        input = playerAttacking.chooseRandomTile(rows, columns);
-      }
+      playerTarget.updateHeatMap();
+      input = playerAttacking.chooseSmartTile(playerTarget.getHeatMap());
+      // while (playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == HIT || playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == MISS) {
+      //   input = playerAttacking.chooseSmartTile();
+      // }
 
       System.out.println(playerAttacking + " is thinking...");
       wait(1000 + (int)(Math.random() * 2000));
