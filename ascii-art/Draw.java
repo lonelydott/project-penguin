@@ -7,7 +7,7 @@ public class Draw {
     }
     public static void PrintShips(int size) throws Exception{
         int count = 0;
-        File ascii = new File("ascii-art/Ascii.txt");
+        File ascii = new File("Ascii.txt");
         Scanner text = new Scanner(ascii);
         while(text.hasNextLine()) {
             System.out.println(text.nextLine());
@@ -16,9 +16,9 @@ public class Draw {
                 Thread.sleep(150);
                 clear();
                 Thread.sleep(15);
-                // System.out.print("\033[H\033[2J");  
-                
-                // System.out.flush();  
+                // System.out.print("\033[H\033[2J");
+
+                // System.out.flush();
             }
         }
     }
@@ -26,8 +26,6 @@ public class Draw {
     public static void clear() throws Exception{
         Thread.sleep(80);
         System.out.print("\u001b[2J");
-        Thread.sleep(10);
+        //Thread.sleep(10);
     }
 }
-
-

@@ -35,11 +35,11 @@ public class PowerUp{
     int col = input.charAt(0) - 64;
 
     if (board[row][col] >= 0) { // MISS
-      if (board[row][col] == 0) { //check if tile is empty
-        board[row][col] = 2; //turn tile to O (miss)
+      if (board[row][col] == Game.EMPTY) { //check if tile is empty
+        board[row][col] = Game.MISS; //turn tile to O (miss)
       }
-      if (board[row][col] == 3) {
-        board[row][col] = 1;
+      if (board[row][col] == Game.TRAP) {
+        board[row][col] = Game.HIT;
         return true;
       }
       return false;
@@ -47,7 +47,7 @@ public class PowerUp{
     else { // HIT!!!!!
       int battleshipHit = (board[row][col] * -1) - 1; //Identify battleship
       beingAttacked.get(battleshipHit).minusOne(); //Find the battleship that got caught, and subtract 1 from its length.
-      board[row][col] = 1; //turn tile to X (hit)
+      board[row][col] = Game.HIT; //turn tile to X (hit)
       return true;
     }
   }
@@ -101,10 +101,10 @@ public class PowerUp{
           System.out.print((char)(board[i][j]));
         }
         else {
-          if (board[i][j] == 1 && j > 0) { //print hits
+          if (board[i][j] == Game.HIT && j > 0) { //print hits
             System.out.print("X");
           }
-          else if (board[i][j] == 2 && j > 0) { //print misses
+          else if (board[i][j] == Game.MISS && j > 0) { //print misses
             System.out.print("O");
           }
           else {
@@ -115,10 +115,10 @@ public class PowerUp{
               }
             }
             else {
-              if (board[i][j] == 0 || !(i <= row + 1 && i >= row - 1 && j <= col + 1 && j >= col - 1)) {
+              if (board[i][j] == Game.EMPTY || !(i <= row + 1 && i >= row - 1 && j <= col + 1 && j >= col - 1)) {
                 System.out.print(" "); //print empties (concealed)
               }
-              else if (board[i][j] == 3) {
+              else if (board[i][j] == Game.TRAP) {
                 System.out.print("T"); //prints traps
               }
               else {

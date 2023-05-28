@@ -8,8 +8,12 @@ public class Game {
   private static boolean powerUpEnabled;
   private static boolean containsCPU = false;
   private static boolean powerUpChosen;
-  //private static ArrayList<String> spotsTaken;
   private static int numberShips = 0;
+  public static final int EMPTY = 0;
+  public static final int HIT = 1;
+  public static final int MISS = 2;
+  public static final int TRAP = 3;
+  //createBoard
   //PLAYER BOARDS: 2d array of numbers. 0 = untouched, 1 = hit, 2 = miss.
   //PLAYER SHIPS LISTS: Keep track of every ship created. Access each ship via this list.
   //SHIPS LEFT INT: WIN/LOSE CONDITION. WHEN A SHIP HAS 0 LENGTH (ALL TILES ARE GUESSED), SUBTRACT 1
@@ -326,13 +330,13 @@ public class Game {
 
     //PROMPT TO CHOOSE TILE
     if (playerAttacking.robotCheck()) {
-      String tile = playerAttacking.chooseRandomTile(rows, columns);
-      System.out.println(playerAttacking + " is thinking...");
-      try {
-        Thread.sleep(2000 + (int)(Math.random() * 4000));
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
+      input = playerAttacking.chooseRandomTile(rows, columns);
+      while (playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == HIT || playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == MISS) {
+        input = playerAttacking.chooseRandomTile(rows, columns);
       }
+
+      System.out.println(playerAttacking + " is thinking...");
+      wait(1000 + (int)(Math.random() * 2000));
 
       if (Math.random() < playerAttacking.getPowerUpProbability() && powerUpEnabled) {
         powerUpSelector = (int)(Math.random() * 3);
@@ -349,7 +353,7 @@ public class Game {
       }
       if (powerUpChosen && powerUpEnabled) {
         if (powerUpSelector == 1) {//Choosing nuke
-          if (PowerUp.nuke(tile, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
+          if (PowerUp.nuke(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
             clearTerminal();
             gotoTop();
             System.out.println(playerAttacking + " hit a ship!");
@@ -366,21 +370,21 @@ public class Game {
         if (powerUpSelector == 2) {
           clearTerminal();
           gotoTop();
-          System.out.println("Used a sonar on " + tile + "!");
-          PowerUp.sonar(tile, playerTarget.getBoard());
+          System.out.println("Used a sonar on " + input + "!");
+          PowerUp.sonar(input, playerTarget.getBoard());
         }
         powerUpChosen = false;
       }
       else {
-        int battleshipHit = playerTarget.getBoard()[Integer.parseInt(tile.substring(1, tile.length()))][tile.charAt(0) - 64] * -1 - 1;
-        if (PowerUp.missile(tile, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
+        int battleshipHit = playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] * -1 - 1;
+        if (PowerUp.missile(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
           clearTerminal();
           gotoTop();
           System.out.println(playerAttacking + " hit a ship!");
           printBoard(playerTarget.getBoard(), true);
 
           //NOTE: the attack() method automatically changes internal length of battleship
-          if (battleshipHit != -4 && playerTarget.getShipList().get(battleshipHit).getLength() == 0) { //checking for last hit
+          if (battleshipHit != -4 && playerTarget.getShipList().get(battleshipHit).getLength() == 0) { //checking for last hit, -4 is a trap ship
             playerTarget.decreaseShipsLeft(); //last hit = subtract amount of remaining ships (lose condition)
           }
         }
@@ -434,6 +438,10 @@ public class Game {
       input = in.next();
       while (!isValidCoordinate(input)) {
         System.out.println("Please choose valid coordinates");
+        input = in.next();
+      }
+      while (playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == HIT || playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == MISS) {
+        System.out.println("You cannot choose the same tile twice");
         input = in.next();
       }
 
@@ -498,7 +506,7 @@ public class Game {
     int[][] board = new int[row + 1][col + 1];
     for (int i = 1; i <= row; i ++) {
       for (int j = 1; j <= col; j ++) {
-        board[i][j] = 0; //fill everything with empty plots
+        board[i][j] = EMPTY; //fill everything with empty plots
       }
     }
     for (int i = 1; i <= col; i ++) {
@@ -519,10 +527,10 @@ public class Game {
           System.out.print((char)(board[i][j]));
         }
         else {
-          if (board[i][j] == 1 && j > 0) { //print hits
+          if (board[i][j] == HIT && j > 0) { //print hits
             System.out.print("X");
           }
-          else if (board[i][j] == 2 && j > 0) { //print misses
+          else if (board[i][j] == MISS && j > 0) { //print misses
             System.out.print("O");
           }
           else {
@@ -533,10 +541,10 @@ public class Game {
               }
             }
             else {
-              if (concealed || board[i][j] == 0) {
+              if (concealed || board[i][j] == EMPTY) {
                 System.out.print(" "); //print empties (concealed)
               }
-              else if (board[i][j] == 3) {
+              else if (board[i][j] == TRAP) {
                 System.out.print("T"); //prints traps
               }
               else {
