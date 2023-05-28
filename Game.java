@@ -218,10 +218,17 @@ public class Game {
     printBoard(player.getBoard(), false);
     for (int i = 0; i < numberShips; i ++) {
       if (player.robotCheck()) {
-        while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, player.getShipList())) {
+        while (!isValidCoordinate(front) || !isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || overlap(front, back, player.getShipList())) {
           front = player.chooseRandomTile(rows, columns);
           back = player.chooseRandomTile(rows, columns);
+          if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
+            String swap = front;
+            front = back;
+            back = swap;
+          }
         }
+        System.out.println(front);
+        System.out.println(back);
       }
       else {
       //SET UP COORDINATES
@@ -235,6 +242,11 @@ public class Game {
 
         System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
         back = in.next();
+        if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
+          String swap = front;
+          front = back;
+          back = swap;
+        }
         while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, player.getShipList())) {
           if (back.equals("cancel")) {
             System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
@@ -247,13 +259,12 @@ public class Game {
           System.out.println("Please choose a valid coordinate for length " + (i+2));
 
           back = in.next();
+          if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
+            String swap = front;
+            front = back;
+            back = swap;
+          }
         }
-      }
-
-      if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
-        String swap = front;
-        front = back;
-        back = swap;
       }
       //FINISHING GAME SETUP: finishing board layout with ships and populating arraylist
       player.getShipList().add(new Battleship(front, back)); //arraylist
@@ -646,7 +657,7 @@ public class Game {
     for (int index = 0; index < list.size(); index ++) {
       if (vertical) {
         if (front.charAt(0) - 64 <= list.get(index).getBackX() && front.charAt(0) - 64 >= list.get(index).getFrontX()) {
-          if (Integer.parseInt(front.substring(1)) <= list.get(index).getFrontY() && Integer.parseInt(back.substring(1)) >= list.get(index).getBackY()) {
+          if (Integer.parseInt(front.substring(1)) <= list.get(index).getBackY() && Integer.parseInt(back.substring(1)) >= list.get(index).getFrontY()) {
             return true;
           }
         }
