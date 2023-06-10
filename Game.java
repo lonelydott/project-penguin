@@ -1,5 +1,6 @@
 import java.util.*;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
 public class Game {
   private static ArrayList<Player> playerList;
   private static String numberPlayers;
@@ -112,8 +113,12 @@ public class Game {
       place(playerList.get(i - 1));
     }
     if (containsCPU) {
-      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player " + (Integer.parseInt(numberPlayers) + 1) + " (CPU)"));
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player 1 (CPU)"));
       place(playerList.get(playerList.size() - 1));
+    }
+    if (containsCPU && Integer.parseInt(numberPlayers) == 0) {
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player 2 (CPU)"));
+      place(playerList.get(1));
     }
 
 
@@ -215,20 +220,20 @@ public class Game {
     Scanner in = new Scanner(System.in);
     String front = "";
     String back = "";
-    printBoard(player.getBoard(), false);
+    if (!player.robotCheck()) {
+      printBoard(player.getBoard(), false);
+    }
     for (int i = 0; i < numberShips; i ++) {
       if (player.robotCheck()) {
         while (!isValidCoordinate(front) || !isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || overlap(front, back, player.getShipList())) {
-          front = player.chooseRandomTile(rows, columns);
-          back = player.chooseRandomTile(rows, columns);
+          front = player.chooseRandomTile(player.getBoard());
+          back = player.chooseRandomTile(player.getBoard());
           if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
             String swap = front;
             front = back;
             back = swap;
           }
         }
-        System.out.println(front);
-        System.out.println(back);
       }
       else {
       //SET UP COORDINATES
@@ -273,7 +278,9 @@ public class Game {
 //      System.out.println(Arrays.toString(playerOneBoard));
       clearTerminal();
       gotoTop();
-      printBoard(player.getBoard(), false);
+      if (!(player.robotCheck())) {
+        printBoard(player.getBoard(), false);
+      }
     }
 
     if (powerUpEnabled) {
@@ -313,6 +320,9 @@ public class Game {
         gotoTop();
         printBoard(player.getBoard(), false);
       }
+    }
+    if (player.robotCheck()) {
+      printBoard(player.getBoard(), false);
     }
 
     //GAME SET UP: Announcing final board to player 1
@@ -398,6 +408,11 @@ public class Game {
           //NOTE: the attack() method automatically changes internal length of battleship
           if (battleshipHit != -4 && playerTarget.getShipList().get(battleshipHit).getLength() == 0) { //checking for last hit, -4 is a trap ship
             playerTarget.decreaseShipsLeft(); //last hit = subtract amount of remaining ships (lose condition)
+            clearTerminal();
+            gotoTop();
+            Draw.PrintShips(6);
+            System.out.println(playerAttacking + " sunk a ship!");
+            printBoard(playerTarget.getBoard(), true);
           }
         }
         else { //missed
@@ -493,6 +508,11 @@ public class Game {
           //NOTE: the attack() method automatically changes internal length of battleship
           if (battleshipHit != -4 && playerTarget.getShipList().get(battleshipHit).getLength() == 0) { //checking for last hit
             playerTarget.decreaseShipsLeft(); //last hit = subtract amount of remaining ships (lose condition)
+            clearTerminal();
+            gotoTop();
+            Draw.PrintShips(6);
+            System.out.println("You sunk a ship!");
+            printBoard(playerTarget.getBoard(), true);
           }
         }
         else { //missed
@@ -503,7 +523,6 @@ public class Game {
         }
       }
     }
-
     //Game pause, allow players to see turn result
     System.out.println("PRESS ENTER TO CONTINUE");
     in.nextLine();
