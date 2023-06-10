@@ -371,7 +371,6 @@ public class Game {
       else {
         input = playerAttacking.chooseTile(playerTarget.getBoard());
       }
-      System.out.println(input);
       // while (playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == HIT || playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == MISS) {
       //   input = playerAttacking.chooseTile();
       // }
