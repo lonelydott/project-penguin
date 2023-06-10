@@ -78,16 +78,15 @@ public class Game {
       }
       powerUpEnabled = (input.equals("Y"));
 
-      System.out.println("How many players?"); //ROWS
+      System.out.println("How many players? (0 players will result in CPU vs CPU)"); //ROWS
       numberPlayers = in.next();
-      while(!isValid(numberPlayers, 1, -1)) {
+      while(!isValid(numberPlayers, 0, -1)) {
         System.out.println("Please enter a valid amount of players!");
-        inputRows = in.next();
-        numberPlayers = inputRows;
+        numberPlayers = in.next();
       }
       playerList = new ArrayList<Player>(Integer.parseInt(numberPlayers));
 
-      if (!numberPlayers.equals("1")){
+      if (Integer.parseInt(numberPlayers) > 1) {
         System.out.println("Add a CPU player? (Y/N)");
         input = in.next();
         while(!((input.equals("Y")) || input.equals("N"))) {
@@ -108,16 +107,30 @@ public class Game {
     for (int i = 1; i < Integer.parseInt(numberPlayers) + 1; i ++) {
       clearTerminal();
       gotoTop();
-      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, false, "Player " + i));
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, false, "Player " + i, 0));
       System.out.println(playerList.get(i - 1) + ": CREATE YOUR SHIPS");
       place(playerList.get(i - 1));
     }
+
+    String diff;
     if (containsCPU) {
-      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player 1 (CPU)"));
+      System.out.println("How hard should CPU 1 be? (1 = EASY, 2 = MEDIUM, 3 = HARD)"); //ROWS
+      diff = in.next();
+      while(!isValid(diff, 1, 3)) {
+        System.out.println("Please enter a valid difficulty! (1 = EASY, 2 = MEDIUM, 3 = HARD)");
+        diff = in.next();
+      }
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player " + (Integer.parseInt(numberPlayers) + 1), Integer.parseInt(diff)));
       place(playerList.get(playerList.size() - 1));
     }
     if (containsCPU && Integer.parseInt(numberPlayers) == 0) {
-      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player 2 (CPU)"));
+      System.out.println("How hard should CPU 2 be? (1 = EASY, 2 = MEDIUM, 3 = HARD)"); //ROWS
+      diff = in.next();
+      while(!isValid(diff, 1, 3)) {
+        System.out.println("Please enter a valid difficulty! (1 = EASY, 2 = MEDIUM, 3 = HARD)");
+        diff = in.next();
+      }
+      playerList.add(new Player(rows, columns, numberShips, powerUpEnabled, true, "Player 2", Integer.parseInt(diff)));
       place(playerList.get(1));
     }
 
@@ -351,10 +364,16 @@ public class Game {
 
     //PROMPT TO CHOOSE TILE
     if (playerAttacking.robotCheck()) {
-      playerTarget.updateHeatMap();
-      input = playerAttacking.chooseSmartTile(playerTarget.getHeatMap());
+      if (playerAttacking.getDifficulty() == 3) {
+        playerTarget.updateHeatMap();
+        input = playerAttacking.chooseTile(playerTarget.getHeatMap());
+      }
+      else {
+        input = playerAttacking.chooseTile(playerTarget.getBoard());
+      }
+      System.out.println(input);
       // while (playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == HIT || playerTarget.getBoard()[Integer.parseInt(input.substring(1, input.length()))][input.charAt(0) - 64] == MISS) {
-      //   input = playerAttacking.chooseSmartTile();
+      //   input = playerAttacking.chooseTile();
       // }
 
       System.out.println(playerAttacking + " is thinking...");

@@ -1,6 +1,7 @@
 
 public class Battleship {
   private int length;
+  private int Origlength;
   //coordinates of front of ship
   private int frontRow;
   private int frontCol;
@@ -14,6 +15,7 @@ public class Battleship {
     backRow = Integer.parseInt(coordsBack.substring(1, coordsBack.length()));
     backCol = coordsBack.charAt(0) - 64;
     length = Math.abs(frontRow - backRow) + Math.abs(frontCol - backCol) + 1;
+    Origlength = length;
   }
 
   public int getFrontX() {
