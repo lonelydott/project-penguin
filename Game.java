@@ -33,6 +33,23 @@ public class Game {
     Scanner in = new Scanner(System.in);
     //Keep track of player inputs
 
+    clearTerminal();
+    gotoTop();
+    System.out.println("  ____       _______ _______ _      ______  _____ _    _ _____ _____  ");
+    wait(300);
+    System.out.println(" |  _ \\   /\\|__   __|__   __| |    |  ____|/ ____| |  | |_   _|  __ \\ ");
+    wait(300);
+    System.out.println(" | |_) | /  \\  | |     | |  | |    | |__  | (___ | |__| | | | | |__) |");
+    wait(300);
+    System.out.println(" |  _ < / /\\ \\ | |     | |  | |    |  __|  \\___ \\|  __  | | | |  ___/ ");
+    wait(300);
+    System.out.println(" | |_) / ____ \\| |     | |  | |____| |____ ____) | |  | |_| |_| |     ");
+    wait(300);
+    System.out.println(" |____/_/    \\_\\_|     |_|  |______|______|_____/|_|  |_|_____|_|    ");
+    wait(300);
+    System.out.println("PRESS ENTER TO CONTINUE");
+    in.nextLine();
+
     //INITIAL GAME SETUP
     clearTerminal();
     gotoTop();
