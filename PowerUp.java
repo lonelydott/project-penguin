@@ -6,7 +6,7 @@ public class PowerUp{
   private int numberSonars;
 
   public PowerUp() {
-    numberNukes = 1;
+    numberNukes = 2;
     numberTraps = 1;
     numberSonars = 2;
   }
@@ -26,6 +26,9 @@ public class PowerUp{
   }
   public int getSonars() {
     return numberSonars;
+  }
+  public void useSonar() {
+    numberSonars --;
   }
 
   //area of impact: 1x1
@@ -92,7 +95,7 @@ public class PowerUp{
     Battleship bait = new Battleship(xcor, ycor);
     return bait;
   }
-  public static void sonar(String coord, int[][] board){ //creates a 1x1 ship as bait to throwoff the enemy player
+  public static String sonar(String coord, int[][] board, Player player){ //creates a 1x1 ship as bait to throwoff the enemy player
     int row = Integer.parseInt(coord.substring(1, coord.length()));
     int col = coord.charAt(0) - 64;
     for (int i = 0; i < board.length; i ++) {
@@ -123,6 +126,9 @@ public class PowerUp{
               }
               else {
                 System.out.print(board[i][j] * -1); //print ships (not concealed)
+                if (player.robotCheck()) {
+                  player.setSonared("" + (char)(j + 64) + i);
+                }
               }
             }
           }
@@ -133,6 +139,7 @@ public class PowerUp{
       }
       System.out.println("");
     }
+    return "";
   }
 
   public static boolean nukeHelper(int row, int col, int[][] board, ArrayList<Battleship> beingAttacked) { //ASSUME IT IS IN A1 FORMAT

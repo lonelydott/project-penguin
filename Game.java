@@ -298,40 +298,56 @@ public class Game {
 
     if (powerUpEnabled) {
       for (int i = 0; i < player.getPowerUp().getTraps(); i ++) {
-        System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
-        front = in.next();
-        while (!isValidCoordinate(front)) {
-          System.out.println("Please enter in valid A1 format");
+        if (!player.robotCheck()) {
+          System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
+
           front = in.next();
-        }
-
-
-        System.out.println("Back of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
-        back = in.next();
-        while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, player.getShipList())) {
-          if (back.equals("cancel")) {
-            System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
+          while (!isValidCoordinate(front)) {
+            System.out.println("Please enter in valid A1 format");
             front = in.next();
-            while (!isValidCoordinate(front)) {
-              System.out.println("Please enter in valid A1 format");
+          }
+
+
+          System.out.println("Back of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
+          back = in.next();
+          while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, player.getShipList())) {
+            if (back.equals("cancel")) {
+              System.out.println("Front of Trap " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
               front = in.next();
+              while (!isValidCoordinate(front)) {
+                System.out.println("Please enter in valid A1 format");
+                front = in.next();
+              }
+            }
+            System.out.println("Please choose a valid coordinate for length " + (i+2));
+            back = in.next();
+          }
+
+          if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
+            String swap = front;
+            front = back;
+            back = swap;
+          }
+          Battleship trap = new Battleship(front, back);
+          trap.place(player.getBoard(), 3);
+
+          clearTerminal();
+          gotoTop();
+          printBoard(player.getBoard(), false);
+        }
+        else {
+          while (!isValidCoordinate(front) || !isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || overlap(front, back, player.getShipList())) {
+            front = player.chooseRandomTile(player.getBoard());
+            back = player.chooseRandomTile(player.getBoard());
+            if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
+              String swap = front;
+              front = back;
+              back = swap;
             }
           }
-          System.out.println("Please choose a valid coordinate for length " + (i+2));
-          back = in.next();
+          Battleship trap = new Battleship(front, back);
+          trap.place(player.getBoard(), 3);
         }
-
-        if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
-          String swap = front;
-          front = back;
-          back = swap;
-        }
-        Battleship trap = new Battleship(front, back);
-        trap.place(player.getBoard(), 3);
-
-        clearTerminal();
-        gotoTop();
-        printBoard(player.getBoard(), false);
       }
     }
     if (player.robotCheck()) {
@@ -396,13 +412,13 @@ public class Game {
           if (PowerUp.nuke(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
             clearTerminal();
             gotoTop();
-            System.out.println(playerAttacking + " hit a ship!");
+            System.out.println(playerAttacking + " used a nuke and hit a ship!");
             printBoard(playerTarget.getBoard(), true);
           }
           else { //missed
             clearTerminal();
             gotoTop();
-            System.out.println(playerAttacking + " missed!");
+            System.out.println(playerAttacking + " used a nuke and missed!");
             printBoard(playerTarget.getBoard(), true);
           }
           playerAttacking.getPowerUp().useNuke();
@@ -411,7 +427,8 @@ public class Game {
           clearTerminal();
           gotoTop();
           System.out.println("Used a sonar on " + input + "!");
-          PowerUp.sonar(input, playerTarget.getBoard());
+          PowerUp.sonar(input, playerTarget.getBoard(), playerAttacking);
+          playerAttacking.getPowerUp().useSonar();
         }
         powerUpChosen = false;
       }
@@ -496,13 +513,13 @@ public class Game {
           if (PowerUp.nuke(input, playerTarget.getBoard(), playerTarget.getShipList())) {//if true, then battleship is hit
             clearTerminal();
             gotoTop();
-            System.out.println("You hit a ship!");
+            System.out.println("You used a nuke and hit a ship!");
             printBoard(playerTarget.getBoard(), true);
           }
           else { //missed
             clearTerminal();
             gotoTop();
-            System.out.println("You missed!");
+            System.out.println("You used a nuke and missed!");
             printBoard(playerTarget.getBoard(), true);
           }
           playerAttacking.getPowerUp().useNuke();
@@ -511,7 +528,8 @@ public class Game {
           clearTerminal();
           gotoTop();
           System.out.println("Used a sonar on " + input + "!");
-          PowerUp.sonar(input, playerTarget.getBoard());
+          PowerUp.sonar(input, playerTarget.getBoard(), playerAttacking);
+          playerAttacking.getPowerUp().useSonar();
         }
         powerUpChosen = false;
       }
@@ -543,6 +561,10 @@ public class Game {
     }
     //Game pause, allow players to see turn result
     System.out.println("PRESS ENTER TO CONTINUE");
+    if (playerAttacking.robotCheck()) {
+      System.out.println("Nukes left: " + playerAttacking.getPowerUp().getNukes());
+      System.out.println("Sonars left: " + playerAttacking.getPowerUp().getSonars());
+    }
     in.nextLine();
     if (!playerAttacking.robotCheck()) {
       in.nextLine();

@@ -16,6 +16,7 @@ public class Player {
   private static final int EASY = 1; //RANDOMLY
   private static final int MEDIUM = 2; //GRID TILE
   private static final int HARD = 3; //HEATMAP
+  private String sonared = "";
 
 
   //increase probability of choosing power ups when there are less available tiles
@@ -69,10 +70,19 @@ public class Player {
   public String toString() {
     return name;
   }
+  public void setSonared(String s) {
+    sonared = s;
+  }
 
 
   //for future CPU classes
   public String chooseTile(int[][] board) {
+    if (!sonared.equals("")) {
+      String temp = sonared;
+      sonared = "";
+      return temp;
+    }
+
     if (difficulty == EASY) {
       return chooseRandomTile(board);
     }
@@ -133,8 +143,6 @@ public class Player {
 
         for (int k = 0; k < playerShipsLeft; k ++) {
           for (int shipLength = 0; shipLength < k + 2; shipLength ++) {
-
-
             if (i + shipLength < heatMap.length - shipLength) {
               if (heatMap[i + shipLength][j] >= 0) {
                 heatMap[i + shipLength][j] ++;
