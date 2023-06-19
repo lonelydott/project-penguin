@@ -580,7 +580,7 @@ public class Game {
     }
     //Game pause, allow players to see turn result
     System.out.println("PRESS ENTER TO CONTINUE");
-    if (playerAttacking.robotCheck()) {
+    if (playerAttacking.robotCheck() & powerUpEnabled) {
       System.out.println("Nukes left: " + playerAttacking.getPowerUp().getNukes());
       System.out.println("Sonars left: " + playerAttacking.getPowerUp().getSonars());
     }
