@@ -36,17 +36,17 @@ public class Game {
     clearTerminal();
     gotoTop();
     System.out.println("  ____       _______ _______ _      ______  _____ _    _ _____ _____  ");
-    wait(300);
+    wait(400);
     System.out.println(" |  _ \\   /\\|__   __|__   __| |    |  ____|/ ____| |  | |_   _|  __ \\ ");
-    wait(300);
+    wait(400);
     System.out.println(" | |_) | /  \\  | |     | |  | |    | |__  | (___ | |__| | | | | |__) |");
-    wait(300);
+    wait(400);
     System.out.println(" |  _ < / /\\ \\ | |     | |  | |    |  __|  \\___ \\|  __  | | | |  ___/ ");
-    wait(300);
+    wait(400);
     System.out.println(" | |_) / ____ \\| |     | |  | |____| |____ ____) | |  | |_| |_| |     ");
-    wait(300);
+    wait(400);
     System.out.println(" |____/_/    \\_\\_|     |_|  |______|______|_____/|_|  |_|_____|_|    ");
-    wait(300);
+    wait(400);
     System.out.println("PRESS ENTER TO CONTINUE");
     in.nextLine();
 
@@ -283,17 +283,19 @@ public class Game {
           back = swap;
         }
         while (!isValidCoordinate(back) || isDiagonal(front, back) || !lengthCheck(front, back, i+2) || back == "cancel" || overlap(front, back, player.getShipList())) {
-          if (back.equals("cancel")) {
+          System.out.println("Please choose a valid coordinate for length " + (i+2));
+
+          back = in.next();
+          while (back.equals("cancel")) {
             System.out.println("Front of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): ");
             front = in.next();
             while (!isValidCoordinate(front)) {
               System.out.println("Please enter in valid A1 format");
               front = in.next();
             }
+            System.out.println("Back of Ship " + (i + 1) + " with length " + (i+2) + " (A1 format): (type \"cancel\" to reset coordinates)");
+            back = in.next();
           }
-          System.out.println("Please choose a valid coordinate for length " + (i+2));
-
-          back = in.next();
           if (front.charAt(0) > back.charAt(0) || Integer.parseInt(front.substring(1)) > Integer.parseInt(back.substring(1))) {
             String swap = front;
             front = back;
